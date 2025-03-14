@@ -1,0 +1,70 @@
+# docker-compose.yml
+version: '3.8'
+#╔═══════════════════════════════════════╗
+#║  Iniciar y Construir Contenedores:    ║
+#║  docker-compose up -d --build         ║
+#╠═══════════════════════════════════════╣
+#║  Detener Contenedores:                ║
+#║  docker-compose down                  ║
+#╚═══════════════════════════════════════╝
+# Define los servicios (contenedores) que componen la aplicación.
+services:
+  # Servicio para el servidor web Nginx.
+  nginx:
+    # Configuración para construir la imagen de Nginx a partir de un Dockerfile.
+    build:
+      context: .  # El directorio actual (.) es el contexto de construcción.
+      dockerfile: Dockerfile  # Usa el archivo llamado 'Dockerfile' en el contexto.
+    ports:
+      - "80:80"  # Mapea el puerto 80 del host al puerto 80 del contenedor Nginx.
+    networks:
+      - red_www  # Conecta el contenedor Nginx a la red 'red_www'.
+    depends_on:
+      - php-fpm  # Asegura que el contenedor 'php-fpm' se inicie antes que Nginx.
+    volumes:
+      - ./www:/var/www/html  # Monta el directorio 'www' del host en '/var/www/html' dentro del contenedor.
+
+  # Servicio para PHP-FPM (FastCGI Process Manager).
+  php-fpm:
+    image: php:8.2-fpm  # Usa la imagen oficial de PHP-FPM versión 8.2.
+    networks:
+      - red_www  # Conecta el contenedor PHP-FPM a la red 'red_www'.
+    volumes:
+      - ./www:/var/www/html:cached  # Monta el mismo directorio 'www' que Nginx, con optimización de cache.
+    working_dir: /var/www/html # Establece /var/www/html como directorio "de trabajo".
+
+  # Servicio para la base de datos MariaDB.
+  mariadb:
+    image: mariadb:latest  # Usa la última imagen oficial de MariaDB.
+    environment:
+      # Variables de entorno para configurar MariaDB.
+      MARIADB_ROOT_PASSWORD: mht85  # Contraseña del usuario root.
+      MARIADB_DATABASE: bbdd  # Nombre de la base de datos a crear.
+      MARIADB_USER: mht  # Nombre del usuario de la base de datos.
+      MARIADB_PASSWORD: mht  # Contraseña del usuario de la base de datos.
+    networks:
+      - red_www  # Conecta el contenedor MariaDB a la red 'red_www'.
+    volumes:
+      - mariadb_data:/var/lib/mysql  # Monta un volumen con nombre 'mariadb_data' para guardar los datos de forma persistente.
+
+  # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
+  phpmyadmin:
+    image: phpmyadmin:latest  # Usa la última imagen oficial de phpMyAdmin.
+    ports:
+      - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor phpMyAdmin.
+    environment:
+      # Variables de entorno para configurar phpMyAdmin.
+      PMA_HOST: mariadb  # Nombre del servicio (MariaDB) al que se conectará.
+      PMA_PORT: 3306  # Puerto de MariaDB.
+    networks:
+      - red_www  # Conecta el contenedor phpMyAdmin a la red 'red_www'.
+    depends_on:
+      - mariadb  # Asegura que MariaDB se inicie antes que phpMyAdmin.
+
+# Define los volúmenes que se van a usar.
+volumes:
+  mariadb_data:  # Define el volumen llamado 'mariadb_data' que ya explicamos antes.
+
+# Define las redes que se utilizarán.
+networks:
+  red_www:  # Define una red llamada 'red_www' para la comunicación entre los contenedores.
