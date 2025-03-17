@@ -21,8 +21,10 @@ services:
       - red_www  # Conecta el contenedor Nginx a la red 'red_www'.
     depends_on:
       - php-fpm  # Asegura que el contenedor 'php-fpm' se inicie antes que Nginx.
+      - angular  #  Asegúrate de que Nginx dependa de la app Angular.
     volumes:
       - ./www:/var/www/html  # Monta el directorio 'www' del host en '/var/www/html' dentro del contenedor.
+      - ./nginx/angular.conf:/etc/nginx/conf.d/angular.conf # Monta el fichero 'angular.conf' dentro de la configuracion de Nginx.
 
   # Servicio para PHP-FPM (FastCGI Process Manager).
   php-fpm:
@@ -60,6 +62,14 @@ services:
       - red_www  # Conecta el contenedor phpMyAdmin a la red 'red_www'.
     depends_on:
       - mariadb  # Asegura que MariaDB se inicie antes que phpMyAdmin.
+
+  angular:
+    build:
+      context: ./../angular/app-test  # <-- AHORA el contexto es app-test
+      dockerfile: ../Dockerfile          
+    networks:
+      - red_www
+    # volumes:  <-- SIN VOLUMENES
 
 # Define los volúmenes que se van a usar.
 volumes:

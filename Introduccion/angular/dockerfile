@@ -1,0 +1,11 @@
+    # IUITLM---DAW-1/Introduccion/angular/app-test/Dockerfile (ORIGINAL)
+
+    FROM node:18 AS build
+    WORKDIR /app
+    COPY . .
+    RUN npm install
+    RUN npm run build -- --configuration production
+
+    FROM nginx:stable-alpine
+    COPY --from=build /app/dist/app-test /usr/share/nginx/html
+    EXPOSE 80
