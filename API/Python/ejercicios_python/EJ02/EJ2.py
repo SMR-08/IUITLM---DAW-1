@@ -12,13 +12,15 @@ class Coche:
         print(f"Marca: {self.marca}, Modelo: {self.modelo}, Año: {self.año}")
 
 
-# Crear lista de coches
-coches = [
-    Coche("Toyota", "Corolla", 2020),
-    Coche("Honda", "Civic", 2021),
-    Coche("Ford", "Mustang", 2022),
-]
+if __name__ == '__main__':
+    
+    # Crear lista de coches
+    coches = [
+        Coche("Toyota", "Corolla", 2020),
+        Coche("Honda", "Civic", 2021),
+        Coche("Ford", "Mustang", 2022),
+    ]
 
-# Mostrar información de todos los coches
-for coche in coches:
-    coche.mostrar_info()
+    # Mostrar información de todos los coches
+    for coche in coches:
+        coche.mostrar_info()
