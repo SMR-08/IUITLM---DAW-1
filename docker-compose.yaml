@@ -1,4 +1,4 @@
-# docker-compose.yml
+# docker-compose.yaml
 version: '3.8'
 #╔═══════════════════════════════════════╗
 #║  Iniciar y Construir Contenedores:    ║
@@ -13,18 +13,20 @@ services:
   nginx:
     # Configuración para construir la imagen de Nginx a partir de un Dockerfile.
     build:
-      context: .  # El directorio actual (.) es el contexto de construcción.
-      dockerfile: Dockerfile  # Usa el archivo llamado 'Dockerfile' en el contexto.
+      context: ./Introduccion/docker  # El directorio docker es el contexto de construcción.
+      dockerfile: dockerfile  # Usa el archivo llamado 'Dockerfile' en el contexto.
     ports:
       - "80:80"  # Mapea el puerto 80 del host al puerto 80 del contenedor Nginx.
     networks:
       - red_www  # Conecta el contenedor Nginx a la red 'red_www'.
     depends_on:
       - php-fpm  # Asegura que el contenedor 'php-fpm' se inicie antes que Nginx.
-      - angular  #  Asegúrate de que Nginx dependa de la app Angular.
+      - angular  # Asegura que el contenedor 'angular' se inicie antes que Nginx.
+      - python-api # Asegura que el contenedor 'python-api' se inicie antes que Nginx. 
     volumes:
-      - ./www:/var/www/html  # Monta el directorio 'www' del host en '/var/www/html' dentro del contenedor.
-      - ./nginx/angular.conf:/etc/nginx/conf.d/angular.conf # Monta el fichero 'angular.conf' dentro de la configuracion de Nginx.
+      - ./Introduccion/docker/www:/var/www/html  # Monta el directorio 'www' del host en '/var/www/html' dentro del contenedor.
+      - ./Introduccion/docker/nginx/angular.conf:/etc/nginx/conf.d/angular.conf # Monta el fichero 'angular.conf' dentro de la configuracion de Nginx.
+      - ./IUITLM---DAW-1/Introduccion/docker/nginx/api.conf:/etc/nginx/conf.d/api.conf # Configuracion de Nginx para usar de proxy inverso
 
   # Servicio para PHP-FPM (FastCGI Process Manager).
   php-fpm:
@@ -32,7 +34,7 @@ services:
     networks:
       - red_www  # Conecta el contenedor PHP-FPM a la red 'red_www'.
     volumes:
-      - ./www:/var/www/html:cached  # Monta el mismo directorio 'www' que Nginx, con optimización de cache.
+      - ./Introduccion/docker/www:/var/www/html:cached  # Monta el mismo directorio 'www' que Nginx, con optimización de cache.
     working_dir: /var/www/html # Establece /var/www/html como directorio "de trabajo".
 
   # Servicio para la base de datos MariaDB.
@@ -65,11 +67,31 @@ services:
 
   angular:
     build:
-      context: ./../angular/app-test  # <-- AHORA el contexto es app-test
-      dockerfile: ../Dockerfile          
+      context: ./Introduccion/angular/app-test  # <-- AHORA el contexto es app-test
+      dockerfile: Dockerfile
     networks:
       - red_www
     # volumes:  <-- SIN VOLUMENES
+
+  python-api:  # Servicio para las API's de Python
+    build:
+      context: ./API  # Contexto para el Dockerfile de Python
+      dockerfile: dockerfile       # Nombre del dockerfile
+    ports:
+      - "5000:8000"  # Mapea el puerto 5000 del host al 8000 del contenedor (Para Gunicorn)
+    networks:
+      - red_www
+    depends_on:
+      - mariadb  # La API depende de MariaDB
+    environment:
+      - DB_HOST=mariadb          # Nombre del servicio MariaDB (para la conexión)
+      - DB_USER=root            # Usuario de MariaDB (root para simplificar, considera un usuario dedicado)
+      - DB_PASSWORD=mht85     # Contraseña de MariaDB (¡CAMBIA ESTO EN PRODUCCIÓN!)
+      - DB_NAME=Banco            # Nombre de la base de datos para Python
+      - FLASK_APP=app           # Nombre de la variable app en app.py
+      - FLASK_DEBUG=1          # Activar el modo debug de Flask (¡DESACTIVA EN PRODUCCIÓN!)
+    volumes:
+      - ./IUITLM---DAW-1/API/Python:/app  # Monta el código de Python
 
 # Define los volúmenes que se van a usar.
 volumes:

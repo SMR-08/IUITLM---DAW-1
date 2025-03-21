@@ -41,4 +41,6 @@ EXPOSE 8000
 #  - "app:app": Especifica el módulo y la aplicación Flask que Gunicorn debe ejecutar.
 #              El primer "app" se refiere al nombre del archivo Python (app.py),
 #              y el segundo "app" se refiere a la instancia de la aplicación Flask dentro de ese archivo.
-CMD ["gunicorn", "--workers", "1", "--bind", "0.0.0.0:8000", "app:app"]
+#CMD ["gunicorn", "--workers", "1", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["python", "test_db.py"]
+#Ejecuta el script de prueba
