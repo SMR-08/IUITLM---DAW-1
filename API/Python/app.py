@@ -1,112 +1,94 @@
-# /API/Python/app.py
-# Para ejecutar desde Vscode lanzalo desde la Terminal: python app.py
-
-from typing import Literal
-from flask import Flask, Response, jsonify, request
-from esPar import es_par  # Importamos la función es_par
-from  ejercicios_python import *
+# app.py
+from flask import Flask, request, jsonify
+from db import obtener_conexion_bd, DatabaseError, insertar_elemento, obtener_todos_los_elementos, actualizar_elemento, eliminar_elemento  # Importa las funciones de db.py
+import logging
 
 app = Flask(__name__)
 
-@app.route('/es_par/<numero>', methods=['GET'])
-# A continuacion iniciamos una funcion llamada 'si_par' que recibe como parametro una variable llamada 'numero'
-# Al final con '->' creamos una pista de que devuelve esta funcion.
-# Devuelve una tupla (secuencia inmutable y hetereogena) que contiene una clase Response y un tipo Literal con valor 400 O un objeto Response (Si es exitoso)
+# Configuración del logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def si_par(numero) -> tuple[Response, Literal[400]] | Response:
-    """
-    Endpoint para comprobar si un número es par.
-
-    Args:
-        numero: El número a comprobar (pasado como parte de la URL).
-
-    Returns:
-        Un JSON con la estructura {"numero": <numero>, "es_par": true/false},
-        o un JSON con error y código de estado 400 si el número no es entero.
-
-    """
-    resultado = es_par(numero)
-
-    #Si el resultado esta vacio devolvera un error.
-    if resultado is None:
-        return jsonify({"error": "El valor proporcionado no es un número entero."}), 400 # Error de Bad Request
-    
-    return jsonify({"numero": int(numero), "es_par": resultado})
 
 @app.route('/cuentas', methods=['POST'])
 def crear_cuenta():
     """
-    Endpoint para crear una nueva cuenta.
-    Espera un JSON: {"titular": "Nombre Apellido", "cantidad": 1000.0}
+    Crea una nueva cuenta en la tabla 'Cuenta'.
+
+    Espera un JSON con los siguientes campos:
+    - titular: Nombre del titular (obligatorio).
+    - cantidad: Saldo inicial (opcional, por defecto 0.00).
+
+    Devuelve:
+    - Un JSON con el ID de la cuenta creada y un mensaje de éxito si la operación es correcta.
+    - Un JSON con un mensaje de error y el código de estado apropiado si falla.
     """
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"error": "No se proporcionaron datos JSON."}), 400
-
-    if not all(key in data for key in ("titular", "cantidad")):
-        return jsonify({"error": "Faltan datos. Se requiere titular y cantidad."}), 400
-
     try:
-        titular = data['titular']
-        cantidad = float(data['cantidad'])
-        cuenta = Cuenta(titular, cantidad)
-        return jsonify({"mensaje": "Cuenta creada correctamente", "titular": cuenta.titular, "saldo": cuenta.cantidad}), 201
+        datos = request.get_json()
 
-    except (ValueError, TypeError) as e:
-        return jsonify({"error": f"Error en formato de datos: {e}"}), 400
+        # Validación básica de la entrada
+        if not datos or 'titular' not in datos:
+            return jsonify({'error': 'Falta el campo "titular"'}), 400  # Bad Request
 
-@app.route('/cuentas/<titular>/saldo', methods=['GET'])
-def consultar_saldo(titular):
+        titular = datos['titular']
+        cantidad = datos.get('cantidad', 0.00)  # Valor por defecto si no se proporciona
+
+        # Validacion de datos (más completa, incluyendo tipos)
+        if not isinstance(titular, str) or not titular.strip():  # Verifica que sea texto y no esté vacío
+            return jsonify({'error': 'El titular debe ser una cadena no vacía'}), 400
+        if not isinstance(cantidad, (int, float)):
+            return jsonify({'error': 'La cantidad debe ser un número'}), 400
+
+
+        # Preparar los datos para la inserción
+        datos_cuenta = {
+            'titular': titular,
+            'cantidad': cantidad
+        }
+
+        # Insertar en la base de datos
+        cuenta_id = insertar_elemento('Cuenta', datos_cuenta)
+
+        # Devolver una respuesta de éxito
+        return jsonify({'message': 'Cuenta creada exitosamente', 'cuenta_id': cuenta_id}), 201  # Created
+
+    except DatabaseError as e:
+        logging.error(f"Error al crear la cuenta: {e}")
+        return jsonify({'error': str(e)}), 500  # Internal Server Error
+    except Exception as e:
+        logging.exception(f"Error inesperado al crear la cuenta: {e}") # Usamos exception para capturar el traceback
+        return jsonify({'error': 'Error inesperado al crear la cuenta'}), 500
+
+@app.route('/cuentas/<int:cuenta_id>/saldo', methods=['GET'])
+def consultar_saldo(cuenta_id):
     """
-    Endpoint para consultar el saldo de una cuenta existente.
-    El titular se pasa como parte de la URL.
+    Consulta el saldo de una cuenta específica.
+
+    Args:
+        cuenta_id: El ID de la cuenta a consultar.
+
+    Devuelve:
+    - Un JSON con el saldo de la cuenta si la encuentra.
+    - Un JSON con un mensaje de error y el código de estado apropiado si no la encuentra o hay un error.
     """
-    #Simulamos la base de datos, al no tenerla la cuenta se debe crear en el metodo POST antes de poder utilizar este metodo.
-    #Si la cuenta no existe, creamos una "temporal" para que no crashee, ya que no tenemos persistencia.
-    cuenta = Cuenta(titular,0)
-    saldo = cuenta.consultar_saldo()
-    return jsonify({"titular": titular, "saldo": saldo})
-
-@app.route('/cuentas/<titular>/gasto', methods=['POST'])
-def realizar_gasto(titular):
-    """
-    Endpoint para realizar un gasto en una cuenta.
-    Espera un JSON con la cantidad a gastar: {"cantidad": 50.0}
-    El titular se pasa como parte de la URL.
-    """
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"error": "No se proporcionaron datos JSON."}), 400
-
-    if 'cantidad' not in data:
-        return jsonify({"error": "Falta la cantidad a gastar."}), 400
-
     try:
-        cantidad_gasto = float(data['cantidad'])
-         #Simulamos la base de datos, al no tenerla la cuenta se debe crear en el metodo POST antes de poder utilizar este metodo.
-         #Si la cuenta no existe, creamos una "temporal" para que no crashee, ya que no tenemos persistencia.
-        cuenta = Cuenta(titular, 1000) #Simulo que ya tiene una cuenta con 1000.
-        saldo_anterior = cuenta.consultar_saldo() #Obtenemos el saldo actual.
-        cuenta.realizar_gasto(cantidad_gasto)  # Intenta realizar el gasto.
-        saldo_actual = cuenta.consultar_saldo() #Obtenemos el saldo despues de la operacion.
+        # Obtener la cuenta de la base de datos
+        cuenta = obtener_todos_los_elementos('Cuenta', filtro={'cuenta_id': cuenta_id})
 
-        if saldo_actual < saldo_anterior:
-            return jsonify({"mensaje": "Gasto realizado correctamente", "titular": titular, "saldo_anterior":saldo_anterior, "saldo": saldo_actual})
-        else:
-            return jsonify({"error": "Saldo insuficiente", "titular": titular, "saldo": saldo_anterior}), 409 # Conflict
+        # Verificar si la cuenta existe
+        if not cuenta:
+            return jsonify({'error': 'Cuenta no encontrada'}), 404  # Not Found
 
-    except (ValueError, TypeError) as e:
-        return jsonify({"error": f"Error en formato de datos: {e}"}), 400
-    
-@app.route('/cuentas/<titular>', methods=['GET'])
-def obtener_titular(titular):
-    """Este Endpoint obtiene el titular, se usa como parte de la URL.
-    """
-    cuenta = Cuenta(titular,0) #Instanciamos
-    return jsonify({"titular":cuenta.consultar_titular()})
+        # Como 'obtener_todos_los_elementos' devuelve una lista, tomamos el primer elemento (si existe)
+        saldo = cuenta[0]
 
+        # Devolver el saldo
+        return jsonify({'cuenta_id': cuenta_id, 'saldo': saldo}), 200  # OK
 
+    except DatabaseError as e:
+        logging.error(f"Error al consultar el saldo de la cuenta {cuenta_id}: {e}")
+        return jsonify({'error': str(e)}), 500  # Internal Server Error
+    except Exception as e:
+        logging.exception(f"Error inesperado al consultar saldo: {e}")
+        return jsonify({'error': 'Error inesperado al consultar el saldo'}), 500
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  # Modo debug para desarrollo

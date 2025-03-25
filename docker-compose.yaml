@@ -11,6 +11,7 @@ version: '3.8'
 services:
   # Servicio para el servidor web Nginx.
   nginx:
+    container_name: nginx
     # Configuración para construir la imagen de Nginx a partir de un Dockerfile.
     build:
       context: ./Introduccion/docker  # El directorio docker es el contexto de construcción.
@@ -26,10 +27,11 @@ services:
     volumes:
       - ./Introduccion/docker/www:/var/www/html  # Monta el directorio 'www' del host en '/var/www/html' dentro del contenedor.
       - ./Introduccion/docker/nginx/angular.conf:/etc/nginx/conf.d/angular.conf # Monta el fichero 'angular.conf' dentro de la configuracion de Nginx.
-      - ./IUITLM---DAW-1/Introduccion/docker/nginx/api.conf:/etc/nginx/conf.d/api.conf # Configuracion de Nginx para usar de proxy inverso
+      - ./Introduccion/docker/nginx/api.conf:/etc/nginx/conf.d/api.conf # Configuracion de Nginx para usar de proxy inverso
 
   # Servicio para PHP-FPM (FastCGI Process Manager).
   php-fpm:
+    container_name: php-fpm
     image: php:8.2-fpm  # Usa la imagen oficial de PHP-FPM versión 8.2.
     networks:
       - red_www  # Conecta el contenedor PHP-FPM a la red 'red_www'.
@@ -39,6 +41,7 @@ services:
 
   # Servicio para la base de datos MariaDB.
   mariadb:
+    container_name: mariadb
     image: mariadb:latest  # Usa la última imagen oficial de MariaDB.
     environment:
       # Variables de entorno para configurar MariaDB.
@@ -53,6 +56,7 @@ services:
 
   # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
   phpmyadmin:
+    container_name: phpmyadmin
     image: phpmyadmin:latest  # Usa la última imagen oficial de phpMyAdmin.
     ports:
       - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor phpMyAdmin.
@@ -66,6 +70,7 @@ services:
       - mariadb  # Asegura que MariaDB se inicie antes que phpMyAdmin.
 
   angular:
+    container_name: angular
     build:
       context: ./Introduccion/angular/app-test  # <-- AHORA el contexto es app-test
       dockerfile: Dockerfile
@@ -74,6 +79,7 @@ services:
     # volumes:  <-- SIN VOLUMENES
 
   python-api:  # Servicio para las API's de Python
+    container_name: python-api
     build:
       context: ./API  # Contexto para el Dockerfile de Python
       dockerfile: dockerfile       # Nombre del dockerfile
@@ -86,12 +92,10 @@ services:
     environment:
       - DB_HOST=mariadb          # Nombre del servicio MariaDB (para la conexión)
       - DB_USER=root            # Usuario de MariaDB (root para simplificar, considera un usuario dedicado)
-      - DB_PASSWORD=mht85     # Contraseña de MariaDB (¡CAMBIA ESTO EN PRODUCCIÓN!)
+      - DB_PASSWORD=mht85     # Contraseña de MariaDB (¡CAMBIA ESTO EN PRODUCCION!)
       - DB_NAME=Banco            # Nombre de la base de datos para Python
-      - FLASK_APP=app           # Nombre de la variable app en app.py
-      - FLASK_DEBUG=1          # Activar el modo debug de Flask (¡DESACTIVA EN PRODUCCIÓN!)
     volumes:
-      - ./IUITLM---DAW-1/API/Python:/app  # Monta el código de Python
+      - ./API/Python:/app  # Monta el código de Python
 
 # Define los volúmenes que se van a usar.
 volumes:
