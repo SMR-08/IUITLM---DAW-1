@@ -12,11 +12,6 @@ COPY ./Python/requisitos.txt /app/requisitos.txt
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requisitos.txt
 
-# Copia el resto del código de la API al contenedor
-COPY ./Python /app/
-
 # Comando para ejecutar la aplicación con Gunicorn (ajusta si no usas Gunicorn)
 # 'app:app' significa:  'nombre_del_archivo:nombre_de_la_variable_app'
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
-
-# EXPOSE 8000  # Ya está expuesto en el docker-compose.yaml, no es necesario aquí

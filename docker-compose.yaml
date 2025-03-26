@@ -76,7 +76,6 @@ services:
       dockerfile: Dockerfile
     networks:
       - red_www
-    # volumes:  <-- SIN VOLUMENES
 
   python-api:  # Servicio para las API's de Python
     container_name: python-api

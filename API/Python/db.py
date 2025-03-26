@@ -153,3 +153,43 @@ def eliminar_elemento(nombre_tabla, id_columna, id_valor):
     finally:
         if conexion:
             conexion.close()
+def obtener_valor_columna(nombre_tabla, columna, filtro):
+    """
+    Obtiene el valor de una columna específica de una fila que cumple un filtro.
+
+    Args:
+        nombre_tabla: Nombre de la tabla.
+        columna: Nombre de la columna a obtener.
+        filtro: Diccionario con las condiciones WHERE (e.g., {'id': 5}).
+
+    Returns:
+        El valor de la columna, o None si no se encuentra la fila.
+        Lanza DatabaseError si hay problemas.
+    """
+    conexion = obtener_conexion_bd()
+    try:
+        cursor = conexion.cursor(dictionary=True)
+        sql = f"SELECT `{columna}` FROM {nombre_tabla}" # Solo seleccionamos la columna que nos interesa
+
+        parametros = []
+        if filtro:
+            condiciones = []
+            for col, valor in filtro.items():
+                condiciones.append(f"`{col}` = %s")
+                parametros.append(valor)
+            sql += " WHERE " + " AND ".join(condiciones)
+
+        cursor.execute(sql, tuple(parametros))
+        resultado = cursor.fetchone()  # Usamos fetchone() porque esperamos solo una fila
+
+        if resultado:
+            return resultado[columna]  # Devolvemos el valor de la columna
+        else:
+            return None  # No se encontró la fila
+
+    except mysql.connector.Error as err:
+        logging.error(f"Error al obtener valor de {columna} en {nombre_tabla}: {err}")
+        raise DatabaseError(f"Error al obtener valor: {err}")
+    finally:
+        if conexion:
+            conexion.close()
