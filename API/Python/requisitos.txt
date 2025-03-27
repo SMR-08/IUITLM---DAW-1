@@ -3,3 +3,4 @@ gunicorn
 SQLAlchemy
 pymysql
 mysql-connector-python
+flask-cors

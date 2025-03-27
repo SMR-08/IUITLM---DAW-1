@@ -2,12 +2,13 @@
 from flask import Flask, request, jsonify
 from db import *
 from ejercicios_python.EJ04.EJ4 import *
+from flask_cors import CORS
 import json
 import logging
 import os
 
 app = Flask(__name__)
-
+CORS(app)
 # Configuración del logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -80,7 +81,9 @@ def obtener_instancia_cuenta(cuenta_id: int):
 
     # No necesitamos un 'except Exception' general aquí,
     # dejamos que DatabaseError y ValueError (lanzadas explícitamente) suban.
-
+@app.route('/')
+def index():
+    return "Estas llamando al Servidor Python de API, ingresa la ruta correcta y respondere!"
 @app.route('/cuentas/<int:cuenta_id>/verificar', methods=['GET'])
 def verificar_cuenta_objeto(cuenta_id):
     """Endpoint de ejemplo para probar obtener_instancia_cuenta."""
@@ -292,7 +295,7 @@ def realizar_gasto_objeto(cuenta_id):
         logging.exception(f"Error inesperado procesando gasto para cuenta {cuenta_id}: {e}")
         return jsonify({'error': 'Error interno inesperado'}), 500
 
-@app.route('/cuentas-joven', methods=['POST'])
+@app.route('/Cuenta_joven', methods=['POST'])
 def crear_cuenta_joven_objeto():
     """
     Crea una nueva entrada para una CuentaJoven en la tabla 'CuentasAlmacenadas'.
@@ -374,6 +377,70 @@ def crear_cuenta_joven_objeto():
     except Exception as e:
         logging.exception(f"Error inesperado al crear entrada de cuenta joven: {e}")
         return jsonify({'error': 'Error inesperado en el servidor'}), 500
+
+@app.route('/apiregistro', methods=['POST'])
+def api_registro_usuario():
+    """
+    Endpoint para registrar un usuario en la tabla 'Usuarios' y vincularlo a una cuenta.
+    Recibe DNI (ya hasheado), contraseña (ya hasheada), e ID de cuenta.
+    """
+    try:
+        # 1. Obtener datos JSON de la solicitud
+        datos_registro = request.get_json()
+
+        # 2. Validar la entrada: campos obligatorios y tipos
+        required_fields = ['dni_usuario', 'contraseña', 'id_cuenta']
+        if not datos_registro or any(field not in datos_registro for field in required_fields):
+            missing_fields = [field for field in required_fields if not datos_registro or field not in datos_registro]
+            return jsonify({'error': f'Faltan campos obligatorios: {", ".join(missing_fields)}'}), 400
+
+        dni_usuario = datos_registro['dni_usuario']
+        contraseña = datos_registro['contraseña'] # Ya hasheada
+        id_cuenta_str = datos_registro['id_cuenta']
+
+        # Validar tipos y formatos
+        if not isinstance(dni_usuario, str) or not dni_usuario.strip():
+            return jsonify({'error': 'El DNI de usuario debe ser una cadena no vacía'}), 400
+        if not isinstance(contraseña, str) or not contraseña.strip(): # Aunque ya hasheada, debe ser string no vacía
+            return jsonify({'error': 'La contraseña debe ser una cadena no vacía'}), 400
+        if not isinstance(id_cuenta_str, (str, int)): # Aceptamos str o int inicialmente, luego convertimos a int
+            return jsonify({'error': 'El ID de cuenta debe ser un número entero'}), 400
+
+        try:
+            id_cuenta = int(id_cuenta_str) # Intentar convertir a entero
+            if id_cuenta <= 0:
+                raise ValueError # Lanzar error si no es positivo
+        except ValueError:
+            return jsonify({'error': 'El ID de cuenta debe ser un número entero positivo válido'}), 400
+
+        # 3. Preparar datos para la inserción en la tabla Usuarios
+        datos_usuario_db = {
+            'dni_usuario': dni_usuario,
+            'contraseña': contraseña,
+            'fk_id_cuenta': id_cuenta # Usamos el ID de cuenta convertido a entero
+        }
+
+        # 4. Insertar el nuevo usuario en la base de datos
+        usuario_id = insertar_elemento('Usuarios', datos_usuario_db)
+
+        # 5. Devolver respuesta de éxito
+        logging.info(f"Usuario registrado con ID: {usuario_id} y vinculado a cuenta ID: {id_cuenta}")
+        return jsonify({
+            'message': 'Usuario registrado exitosamente y vinculado a la cuenta',
+            'usuario_id': usuario_id,
+            'cuenta_id': id_cuenta
+        }), 201 # Created
+
+    except DatabaseError as e:
+        logging.error(f"Error de BD al registrar usuario: {e}")
+        return jsonify({'error': f'Error de base de datos al registrar usuario: {str(e)}'}), 500
+    except json.JSONDecodeError:
+        logging.error("Error al decodificar JSON de entrada para registro de usuario.")
+        return jsonify({'error': 'JSON de entrada inválido'}), 400
+    except Exception as e:
+        logging.exception(f"Error inesperado al registrar usuario: {e}")
+        return jsonify({'error': 'Error interno inesperado'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
