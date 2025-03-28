@@ -32,7 +32,9 @@ services:
   # Servicio para PHP-FPM (FastCGI Process Manager).
   php-fpm:
     container_name: php-fpm
-    image: php:8.2-fpm  # Usa la imagen oficial de PHP-FPM versión 8.2.
+    build:
+      context: ./Introduccion/docker
+      dockerfile: php.dockerfile
     networks:
       - red_www  # Conecta el contenedor PHP-FPM a la red 'red_www'.
     volumes:

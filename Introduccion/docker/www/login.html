@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form action="php/login.php" method="post"> <!-- Updated path to php/login.php -->
+        <label for="dni">DNI:</label><br>
+        <input type="text" id="dni" name="dni" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Login">
+    </form>
+    <p id="error-message" style="color: red;"></p>
+
+    <p>Don't have an account? <a href="registro.html">Register here</a></p>
+</body>
+</html>

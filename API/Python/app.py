@@ -382,7 +382,7 @@ def crear_cuenta_joven_objeto():
 def api_registro_usuario():
     """
     Endpoint para registrar un usuario en la tabla 'Usuarios' y vincularlo a una cuenta.
-    Recibe DNI (ya hasheado), contraseña (ya hasheada), e ID de cuenta.
+    Recibe DNI (ya hasheado) como PRIMARY KEY, contraseña (ya hasheada), e ID de que cuenta tiene que relacionarse.
     """
     try:
         # 1. Obtener datos JSON de la solicitud
@@ -395,7 +395,7 @@ def api_registro_usuario():
             return jsonify({'error': f'Faltan campos obligatorios: {", ".join(missing_fields)}'}), 400
 
         dni_usuario = datos_registro['dni_usuario']
-        contraseña = datos_registro['contraseña'] # Ya hasheada
+        contraseña = datos_registro['contraseña'] 
         id_cuenta_str = datos_registro['id_cuenta']
 
         # Validar tipos y formatos
@@ -412,6 +412,12 @@ def api_registro_usuario():
                 raise ValueError # Lanzar error si no es positivo
         except ValueError:
             return jsonify({'error': 'El ID de cuenta debe ser un número entero positivo válido'}), 400
+            
+        #Verifico que tal id existe
+        cuenta = obtener_todos_los_elementos('CuentasAlmacenadas', filtro={'id': id_cuenta})
+        if not cuenta:
+            return jsonify({'error': 'Cuenta no encontrada'}), 404
+
 
         # 3. Preparar datos para la inserción en la tabla Usuarios
         datos_usuario_db = {
@@ -421,13 +427,20 @@ def api_registro_usuario():
         }
 
         # 4. Insertar el nuevo usuario en la base de datos
-        usuario_id = insertar_elemento('Usuarios', datos_usuario_db)
+        try:
+            usuario_id = insertar_elemento('Usuarios', datos_usuario_db)
+        except DatabaseError as e:
+            if "Duplicate entry" in str(e) and dni_usuario in str(e):
+              return jsonify({'error': f'Ya existe un usuario con este DNI'}), 400
+            else:
+               return jsonify({'error': f'Error de base de datos al registrar usuario: {str(e)}'}), 500
+
 
         # 5. Devolver respuesta de éxito
-        logging.info(f"Usuario registrado con ID: {usuario_id} y vinculado a cuenta ID: {id_cuenta}")
+        logging.info(f"Usuario registrado con DNI: {dni_usuario} y vinculado a cuenta ID: {id_cuenta}")
         return jsonify({
             'message': 'Usuario registrado exitosamente y vinculado a la cuenta',
-            'usuario_id': usuario_id,
+            'dni_usuario': dni_usuario,
             'cuenta_id': id_cuenta
         }), 201 # Created
 

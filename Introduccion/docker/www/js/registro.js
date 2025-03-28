@@ -1,4 +1,4 @@
-// file: js/registro.js
+// file: js/registro.js (POTENTIAL CHANGE)
 document.addEventListener('DOMContentLoaded', function () {
     const registroForm = document.getElementById('registroForm');
     const mensajeDiv = document.getElementById('mensaje');
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const usuarioData = await usuarioResponse.json();
-            mensajeDiv.textContent = 'Usuario y cuenta creados exitosamente. Usuario ID: ' + usuarioData.usuario_id + ', Cuenta ID: ' + usuarioData.cuenta_id;
+            mensajeDiv.textContent = 'Usuario y cuenta creados exitosamente. DNI del Usuario : ' + usuarioData.dni_usuario + ', Cuenta ID: ' + usuarioData.cuenta_id;
             mensajeDiv.classList.remove('oculto');
 
         } catch (error) {
