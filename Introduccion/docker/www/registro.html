@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro de Usuario y Cuenta Bancaria</title>
-    <!--  Enlace a la hoja de estilos CSS para el registro -->
-    <link rel="stylesheet" href="/css/registro.css">
+    <!-- Enlace a la hoja de estilos CSS unificada -->
+    <link rel="stylesheet" href="/css/estilos.css">
 </head>
 <body>
-    <!-- Contenedor principal de la página de registro -->
-    <div class="contenedor-registro">
-        <h1>Registro de Usuario y Cuenta Bancaria</h1>
-        <!--  Formulario con id 'formularioRegistro' para manejar el registro de usuarios -->
+    <!-- Contenedor principal de la página de registro con clase común para formularios -->
+    <div class="contenedor-pagina contenedor-formulario contenedor-registro">
+        <!-- Botón de volver atrás -->
+        <!-- TODO: Usar iconos de AF -->
+        <a href="banco.php" class="boton-volver"><--</a>
+
+        <h2>Registro de Usuario y Cuenta Bancaria</h2>
+        <!-- Formulario con id 'formularioRegistro' para manejar el registro de usuarios -->
         <form id="formularioRegistro">
             <!-- Grupo de formulario para el nombre -->
             <div class="grupo-formulario">
@@ -32,18 +36,23 @@
                 <label for="contraseña">Contraseña:</label>
                 <input type="password" id="contraseña" name="contraseña" required>
             </div>
-            <!--  Botón de envío del formulario para registrarse -->
+            <!-- Botón de envío del formulario con clase botón primario -->
             <button type="submit" class="boton-primario">Registrarse</button>
         </form>
 
-        <!--  Div para mostrar mensajes de éxito, inicialmente oculto -->
+        <!-- Parrafo para preguntar si ya tiene cuenta y link a login -->
+        <p style="margin-top: 20px; text-align: center;">
+            ¿Ya tienes una cuenta? <a href="login.html">Inicia Sesión aquí</a>
+        </p>
+
+        <!-- Div para mostrar mensajes de éxito, inicialmente oculto y con clases mensaje y mensaje-exito -->
         <div id="mensajeExito" class="mensaje mensaje-exito oculto"></div>
-        <!--  Div para mostrar mensajes de error, inicialmente oculto y con clase 'mensaje-error' -->
+        <!-- Div para mostrar mensajes de error, inicialmente oculto y con clases mensaje y mensaje-error -->
         <div id="mensajeError" class="mensaje mensaje-error oculto"></div>
     </div>
-    <!--  Incluye la librería sha256 para hashear contraseñas en el cliente -->
+    <!-- Incluye la librería sha256 para hashear contraseñas en el cliente -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
-    <!--  Enlace al archivo JavaScript 'registro.js' que maneja la lógica del registro -->
+    <!-- Enlace al archivo JavaScript 'registro.js' que maneja la lógica del registro -->
     <script src="/js/registro.js"></script>
 </body>
 </html>
