@@ -3,35 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro de Usuario y Cuenta Bancaria</title>
+    <!--  Enlace a la hoja de estilos CSS para el registro -->
     <link rel="stylesheet" href="/css/registro.css">
 </head>
 <body>
-    <div class="container">
+    <!-- Contenedor principal de la página de registro -->
+    <div class="contenedor-registro">
         <h1>Registro de Usuario y Cuenta Bancaria</h1>
-        <form id="registroForm">
-            <div class="form-group">
+        <!--  Formulario con id 'formularioRegistro' para manejar el registro de usuarios -->
+        <form id="formularioRegistro">
+            <!-- Grupo de formulario para el nombre -->
+            <div class="grupo-formulario">
                 <label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required>
             </div>
-            <div class="form-group">
+            <!-- Grupo de formulario para los apellidos -->
+            <div class="grupo-formulario">
                 <label for="apellidos">Apellidos:</label>
                 <input type="text" id="apellidos" name="apellidos" required>
             </div>
-            <div class="form-group">
+            <!-- Grupo de formulario para el DNI -->
+            <div class="grupo-formulario">
                 <label for="dni">DNI:</label>
                 <input type="text" id="dni" name="dni" required>
             </div>
-            <div class="form-group">
+            <!-- Grupo de formulario para la contraseña -->
+            <div class="grupo-formulario">
                 <label for="contraseña">Contraseña:</label>
                 <input type="password" id="contraseña" name="contraseña" required>
             </div>
-            <button type="submit" class="btn-primary">Registrarse</button>
+            <!--  Botón de envío del formulario para registrarse -->
+            <button type="submit" class="boton-primario">Registrarse</button>
         </form>
 
-        <div id="mensaje" class="mensaje oculto"></div>
-        <div id="errorMensaje" class="mensaje error oculto"></div>
+        <!--  Div para mostrar mensajes de éxito, inicialmente oculto -->
+        <div id="mensajeExito" class="mensaje mensaje-exito oculto"></div>
+        <!--  Div para mostrar mensajes de error, inicialmente oculto y con clase 'mensaje-error' -->
+        <div id="mensajeError" class="mensaje mensaje-error oculto"></div>
     </div>
+    <!--  Incluye la librería sha256 para hashear contraseñas en el cliente -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    <!--  Enlace al archivo JavaScript 'registro.js' que maneja la lógica del registro -->
     <script src="/js/registro.js"></script>
 </body>
 </html>

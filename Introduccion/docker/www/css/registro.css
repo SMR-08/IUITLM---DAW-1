@@ -1,4 +1,5 @@
-.container {
+/* Estilos para el contenedor principal de registro */
+.contenedor-registro {
     width: 500px;
     margin: 50px auto;
     padding: 20px;
@@ -7,26 +8,30 @@
     font-family: sans-serif;
 }
 
-.form-group {
+/* Estilos para cada grupo de formulario (label y input) */
+.grupo-formulario {
     margin-bottom: 15px;
 }
 
-.form-group label {
+/* Estilos para las etiquetas dentro de los grupos de formulario */
+.grupo-formulario label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-.form-group input[type="text"],
-.form-group input[type="password"] {
+/* Estilos para los inputs de tipo texto y password dentro de los grupos de formulario */
+.grupo-formulario input[type="text"],
+.grupo-formulario input[type="password"] {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 3px;
-    box-sizing: border-box; /* Important for width: 100% to work correctly with padding and border */
+    box-sizing: border-box; /* Importante para que width: 100% funcione correctamente con padding y border */
 }
 
-button.btn-primary {
+/* Estilos para el botón primario de acción (Registrarse) */
+button.boton-primario {
     background-color: #007bff;
     color: white;
     padding: 10px 15px;
@@ -35,27 +40,32 @@ button.btn-primary {
     cursor: pointer;
 }
 
-button.btn-primary:hover {
+/* Estilos para el botón primario al pasar el ratón por encima */
+button.boton-primario:hover {
     background-color: #0056b3;
 }
 
+/* Estilos base para los mensajes (éxito/error) */
 .mensaje {
     padding: 10px;
     margin-top: 20px;
     border-radius: 3px;
 }
 
+/* Estilos para ocultar elementos con la clase 'oculto' */
 .mensaje.oculto {
     display: none;
 }
 
-.mensaje.error {
+/* Estilos específicos para mensajes de error */
+.mensaje.mensaje-error {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
 
-.mensaje {
+/* Estilos específicos para mensajes de éxito */
+.mensaje.mensaje-exito {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;

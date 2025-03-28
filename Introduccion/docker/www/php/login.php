@@ -1,101 +1,105 @@
 <?php
 session_start();
 
-// Database connection details
-$servername = "mariadb";
-$username = "root"; // Consider using a less privileged user in production
-$password = "mht85";
-$dbname = "Banco";    // Use the DB name defined in docker-compose for initial creation
+// Detalles de conexión a la base de datos
+$nombreServidor = "mariadb";
+$nombreUsuario = "root"; // Considerar usar un usuario con menos privilegios en producción
+$contraseña = "mht85";
+$nombreBD = "Banco";    // Usar el nombre de BD definido en docker-compose para la creación inicial
 
-// Error reporting for mysqli
+// Reporte de errores para mysqli
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$conn = null; // Initialize connection variable
-$login_error = ""; // Initialize error message
-// Keep track of plain DNI if form was submitted
-$plain_dni_from_form = isset($_POST["dni"]) ? $_POST["dni"] : '';
+$conexion = null; // Inicializar variable de conexión
+$error_inicio_sesion = ""; // Inicializar mensaje de error
+// Mantener registro del DNI plano si el formulario fue enviado
+$dni_plano_del_formulario = isset($_POST["dni"]) ? $_POST["dni"] : '';
 
 
 try {
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    // Crear conexión
+    $conexion = new mysqli($nombreServidor, $nombreUsuario, $contraseña, $nombreBD);
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // $plain_dni_from_form is already set above
-        $password_from_form = $_POST["password"]; // Corrected variable name
+        // $dni_plano_del_formulario ya está establecido arriba
+        $contraseña_del_formulario = $_POST["password"]; // Nombre de variable corregido
 
-        // Hash the DNI from the form
-        $hashed_dni_from_form = hash('sha256', $plain_dni_from_form);
+        // Hashear el DNI del formulario
+        $dni_hasheado_del_formulario = hash('sha256', $dni_plano_del_formulario);
 
-        // Hash the Password from the form
-        $hashed_password_from_form = hash('sha256', $password_from_form);
+        // Hashear la Contraseña del formulario
+        $contraseña_hasheada_del_formulario = hash('sha256', $contraseña_del_formulario);
 
-        // Query using the HASHED DNI
+        // Consulta usando el DNI HASHEADO
         $sql = "SELECT * FROM Usuarios WHERE dni_usuario = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conexion->prepare($sql);
 
         if ($stmt) {
-            // Bind the HASHED DNI
-            $stmt->bind_param("s", $hashed_dni_from_form);
+            // Vincular el DNI HASHEADO
+            $stmt->bind_param("s", $dni_hasheado_del_formulario);
             $stmt->execute();
-            $result = $stmt->get_result();
+            $resultado = $stmt->get_result();
 
-            if ($result->num_rows > 0) {
-                $user = $result->fetch_assoc();
+            if ($resultado->num_rows > 0) {
+                $usuario = $resultado->fetch_assoc();
 
-                // Compare HASHED passwords
-                if ($hashed_password_from_form === $user['contraseña']) {
-                    // Password matches
-                    $_SESSION["loggedin"] = true;
-                    $_SESSION["dni_usuario_plain"] = $plain_dni_from_form; // Store plain DNI
+                // Comparar contraseñas HASHEADAS
+                if ($contraseña_hasheada_del_formulario === $usuario['contraseña']) {
+                    // Contraseña coincide
+                    $_SESSION["sesion_iniciada"] = true;
+                    $_SESSION["dni_usuario_plano"] = $dni_plano_del_formulario; // Almacenar DNI plano
 
                     $stmt->close();
-                    $conn->close();
-                    // --- UPDATE REDIRECT LOCATION ---
-                    header("Location: ../banco.php"); // Redirect to banco.php
+                    $conexion->close();
+                    // --- ACTUALIZAR UBICACIÓN DE REDIRECCIÓN ---
+                    header("Location: ../banco.php"); // Redirigir a banco.php
                     exit();
                 } else {
-                    $login_error = "Invalid password.";
+                    $error_inicio_sesion = "Contraseña inválida.";
                 }
             } else {
-                $login_error = "No user found with that DNI.";
+                $error_inicio_sesion = "No se encontró usuario con ese DNI.";
             }
             $stmt->close();
         } else {
-            $login_error = "Database query preparation error.";
+            $error_inicio_sesion = "Error de preparación de consulta a la base de datos.";
         }
     }
 
 } catch (mysqli_sql_exception $e) {
-    $login_error = "Database Error: " . $e->getMessage();
+    $error_inicio_sesion = "Error de Base de Datos: " . $e->getMessage();
     // error_log("Database Error: " . $e->getMessage());
-    // $login_error = "An error occurred during login.";
+    // $error_inicio_sesion = "Ocurrió un error durante el inicio de sesión.";
 } finally {
-    if ($conn instanceof mysqli && $conn->thread_id) {
-        $conn->close();
+    if ($conexion instanceof mysqli && $conexion->thread_id) {
+        $conexion->close();
     }
 }
 
-// --- HTML Output Section --- Only runs if not redirected
+// --- Sección de Salida HTML --- Solo se ejecuta si no se ha redirigido
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión</title>
 </head>
 <body>
-    <h2>Login</h2>
+    <h2>Iniciar Sesión</h2>
+    <!--  Formulario que envía los datos a login.php mediante método POST -->
     <form action="login.php" method="post">
         <label for="dni">DNI:</label><br>
-        <input type="text" id="dni" name="dni" required value="<?php echo htmlspecialchars($plain_dni_from_form); ?>"><br><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br> <!-- Corrected input name -->
-        <input type="submit" value="Login">
+        <!--  Muestra el DNI introducido previamente en caso de error -->
+        <input type="text" id="dni" name="dni" required value="<?php echo htmlspecialchars($dni_plano_del_formulario); ?>"><br><br>
+        <label for="password">Contraseña:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Iniciar Sesión">
     </form>
+    <!--  Parrafo para mostrar mensajes de error en rojo -->
     <p id="error-message" style="color: red;">
-        <?php echo htmlspecialchars($login_error); ?>
+        <?php echo htmlspecialchars($error_inicio_sesion); ?>
     </p>
 
-    <p>Don't have an account? <a href="../registro.html">Register here</a></p>
+    <p>¿No tienes una cuenta? <a href="../registro.html">Regístrate aquí</a></p>
 </body>
 </html>

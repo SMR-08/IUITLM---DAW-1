@@ -1,71 +1,91 @@
-// file: js/registro.js (POTENTIAL CHANGE)
+// file: js/registro.js
 document.addEventListener('DOMContentLoaded', function () {
-    const registroForm = document.getElementById('registroForm');
+    // Obtener el formulario de registro por su ID.
+    const formularioRegistro = document.getElementById('registroForm');
+    // Obtener el div para mensajes de éxito por su ID.
     const mensajeDiv = document.getElementById('mensaje');
-    const errorMensajeDiv = document.getElementById('errorMensaje');
+    // Obtener el div para mensajes de error por su ID.
+    const mensajeErrorDiv = document.getElementById('errorMensaje');
 
-    registroForm.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Prevent default form submission
+    // Añadir un listener para el evento 'submit' del formulario.
+    formularioRegistro.addEventListener('submit', async function (event) {
+        // Prevenir el envío por defecto del formulario.
+        event.preventDefault();
 
-        // Reset messages
+        // Resetear mensajes ocultando los divs de mensaje y error.
         mensajeDiv.classList.add('oculto');
-        errorMensajeDiv.classList.add('oculto');
+        mensajeErrorDiv.classList.add('oculto');
 
+        // Obtener los valores de los campos del formulario.
         const nombre = document.getElementById('nombre').value;
         const apellidos = document.getElementById('apellidos').value;
         const dni = document.getElementById('dni').value;
         const contraseña = document.getElementById('contraseña').value;
 
-        // 1. Create Cuenta Request - **UPDATED URL**
+        // 1. Crear Solicitud de Cuenta
         try {
-            const cuentaResponse = await fetch('http://api.localhost/cuentas', { // **Added 'http://api.localhost'**
+            // Realizar una petición POST a la API para crear una cuenta.
+            const respuestaCuenta = await fetch('http://api.localhost/cuentas', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                // Enviar el nombre completo del titular en el cuerpo de la petición.
                 body: JSON.stringify({
                     titular: nombre + ' ' + apellidos
                 })
             });
 
-            if (!cuentaResponse.ok) {
-                const errorData = await cuentaResponse.json();
-                throw new Error(`Error al crear cuenta: ${errorData.error || cuentaResponse.statusText}`);
+            // Si la respuesta de la cuenta no es exitosa, lanzar un error.
+            if (!respuestaCuenta.ok) {
+                const datosError = await respuestaCuenta.json();
+                throw new Error(`Error al crear cuenta: ${datosError.error || respuestaCuenta.statusText}`);
             }
 
-            const cuentaData = await cuentaResponse.json();
-            const cuentaId = cuentaData.id;
+            // Convertir la respuesta de la cuenta a JSON.
+            const datosCuenta = await respuestaCuenta.json();
+            // Obtener el ID de la cuenta creada.
+            const idCuenta = datosCuenta.id;
 
-            // 2. Hash DNI and Contraseña (Client-Side - NOT RECOMMENDED for production passwords)
+            // 2. Hashear DNI y Contraseña (Lado del Cliente - NO RECOMENDADO para contraseñas en producción).
             const dniHash = sha256(dni);
             const contraseñaHash = sha256(contraseña);
 
-            // 3. Create Usuario Request (apiregistro) - **UPDATED URL**
-            const usuarioResponse = await fetch('http://api.localhost/apiregistro', { // **Added 'http://api.localhost'**
+            // 3. Crear Solicitud de Usuario (apiregistro)
+            // Realizar una petición POST a la API para registrar un usuario.
+            const respuestaUsuario = await fetch('http://api.localhost/apiregistro', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                // Enviar DNI hasheado, contraseña hasheada e ID de cuenta en el cuerpo de la petición.
                 body: JSON.stringify({
                     dni_usuario: dniHash,
                     contraseña: contraseñaHash,
-                    id_cuenta: cuentaId
+                    id_cuenta: idCuenta
                 })
             });
 
-            if (!usuarioResponse.ok) {
-                const errorData = await usuarioResponse.json();
-                throw new Error(`Error al registrar usuario: ${errorData.error || usuarioResponse.statusText}`);
+            // Si la respuesta del usuario no es exitosa, lanzar un error.
+            if (!respuestaUsuario.ok) {
+                const datosError = await respuestaUsuario.json();
+                throw new Error(`Error al registrar usuario: ${datosError.error || respuestaUsuario.statusText}`);
             }
 
-            const usuarioData = await usuarioResponse.json();
-            mensajeDiv.textContent = 'Usuario y cuenta creados exitosamente. DNI del Usuario : ' + usuarioData.dni_usuario + ', Cuenta ID: ' + usuarioData.cuenta_id;
+            // Convertir la respuesta del usuario a JSON.
+            const datosUsuario = await respuestaUsuario.json();
+            // Mostrar mensaje de éxito con el DNI del usuario y el ID de la cuenta.
+            mensajeDiv.textContent = 'Usuario y cuenta creados exitosamente. DNI del Usuario : ' + datosUsuario.dni_usuario + ', Cuenta ID: ' + datosUsuario.cuenta_id;
+            // Remover la clase 'oculto' para mostrar el mensaje de éxito.
             mensajeDiv.classList.remove('oculto');
 
         } catch (error) {
+            // Capturar errores durante el proceso de registro.
             console.error('Error en el registro:', error);
-            errorMensajeDiv.textContent = 'Error en el registro: ' + error.message;
-            errorMensajeDiv.classList.remove('oculto');
+            // Mostrar mensaje de error en el div correspondiente.
+            mensajeErrorDiv.textContent = 'Error en el registro: ' + error.message;
+            // Remover la clase 'oculto' para mostrar el mensaje de error.
+            mensajeErrorDiv.classList.remove('oculto');
         }
     });
 });

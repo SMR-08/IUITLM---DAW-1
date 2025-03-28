@@ -1,37 +1,39 @@
 <?php
-    session_start(); // Start the session at the very beginning
+    session_start(); // Iniciar la sesión.
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Banco Main Menu</title>
+    <title>Menú Principal del Banco</title>
 </head>
 <body>
-    <h2>Welcome to Banco!</h2>
+    <h2>Bienvenido a Banco (nombre en proceso)!</h2>
 
     <?php
-        // Check if the user is logged in by looking at the session variable
-        if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-            // User is logged in
-            echo "<h3>Your Account Info:</h3>";
-            // Display user info stored in the session
-            // Use htmlspecialchars to prevent XSS issues when displaying user data
-            if (isset($_SESSION["dni_usuario_plain"])) {
-                 echo "<p>DNI: " . htmlspecialchars($_SESSION["dni_usuario_plain"]) . "</p>";
+        // Verificar si el usuario ha iniciado sesión.
+        if (isset($_SESSION["sesion_iniciada"]) && $_SESSION["sesion_iniciada"] === true) {
+            // Usuario ha iniciado sesión.
+            echo "<h3>Tu Información de Cuenta:</h3>";
+            // Mostrar información del usuario almacenada en la sesión.
+            // Usar htmlspecialchars para prevenir ataques XSS al mostrar datos del usuario.
+            if (isset($_SESSION["dni_usuario_plano"])) {
+                 echo "<p>DNI: " . htmlspecialchars($_SESSION["dni_usuario_plano"]) . "</p>";
             } else {
-                 echo "<p>DNI: Not available</p>"; // Fallback if plain DNI wasn't stored
+                 echo "<p>DNI: No disponible</p>"; // Fallback si el DNI plano no fue almacenado.
             }
-            // Add placeholders for other potential info or actions
-            echo "<p><i>More account details or actions can be added here.</i></p>";
+            // Añadir marcadores de posición para otra información o acciones potenciales.
+            echo "<p><i>Más detalles de la cuenta o acciones pueden ser añadidas aquí.</i></p>";
 
-            // Provide a logout link, pointing to the correct logout script path
-            echo "<p><a href='php/logout.php'>Logout</a></p>";
+            // Proporcionar un enlace para cerrar sesión.
+            echo "<p><a href='php/logout.php'>Cerrar Sesión</a></p>";
 
         } else {
-            // User is not logged in, show login/register links
-            echo "<p>Please log in or register to access your account.</p>";
-            echo "<p><a href='login.html'>Login</a></p>"; // Link to your login form page
-            echo "<p><a href='registro.html'>Register</a></p>"; // Link to your registration page
+            // Usuario no ha iniciado sesión, mostrar enlaces de inicio de sesión/registro.
+            echo "<p>Por favor, inicia sesión o regístrate para acceder a tu cuenta.</p>";
+            // Enlace a la página de inicio de sesión.
+            echo "<p><a href='login.html'>Iniciar Sesión</a></p>";
+            // Enlace a la página de registro.
+            echo "<p><a href='registro.html'>Registrarse</a></p>";
         }
     ?>
 
