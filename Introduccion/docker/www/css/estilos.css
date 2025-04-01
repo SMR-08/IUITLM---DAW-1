@@ -1,0 +1,348 @@
+/* Modern Banking Website CSS */
+:root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --primary-light: #e0f2fe;
+    --secondary: #2ecc71;
+    --secondary-dark: #27ae60;
+    --danger: #e74c3c;
+    --dark: #2c3e50;
+    --light: #ecf0f1;
+    --gray: #95a5a6;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: var(--dark);
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Header Styles */
+  header {
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 1rem 0;
+    box-shadow: var(--shadow);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  /* Navigation */
+  nav ul {
+    display: flex;
+    list-style: none;
+  }
+  
+  nav ul li {
+    margin-left: 20px;
+  }
+  
+  nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    transition: opacity 0.3s;
+  }
+  
+  nav ul li a:hover {
+    opacity: 0.8;
+  }
+  
+  /* Main Content */
+  main {
+    padding: 2rem 0;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+    color: var(--dark);
+    font-size: 1rem;
+  }
+  
+  a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+  
+  /* Card Styles */
+  .card {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Form Styles */
+  form {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  /* Button Styles */
+  .btn,
+  button,
+  input[type="submit"] {
+    display: inline-block;
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .btn:hover,
+  button:hover,
+  input[type="submit"]:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  
+  .btn:active,
+  button:active,
+  input[type="submit"]:active {
+    transform: translateY(0);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .btn-secondary {
+    background-color: var(--secondary);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--secondary-dark);
+  }
+  
+  .btn-danger {
+    background-color: var(--danger);
+  }
+  
+  .btn-block {
+    display: block;
+    width: 100%;
+  }
+  
+  /* Message Styles */
+  .mensaje {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: var(--radius);
+    font-weight: 500;
+  }
+  
+  .mensaje.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: var(--secondary-dark);
+    border: 1px solid var(--secondary);
+  }
+  
+  .mensaje.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+  
+  .mensaje.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: var(--primary-dark);
+    border: 1px solid var(--primary);
+  }
+  
+  .oculto {
+    display: none;
+  }
+  
+  /* Account Info Styles */
+  .account-info {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .account-info h3 {
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .account-info p {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 2rem;
+    }
+  
+    h2 {
+      font-size: 1.75rem;
+    }
+  
+    form {
+      padding: 1.5rem;
+    }
+  
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    nav ul {
+      margin-top: 1rem;
+      justify-content: center;
+    }
+  
+    nav ul li {
+      margin: 0 10px;
+    }
+  }
+  
+  /* Top Bar Styles (preserved from original) */
+  .top-bar {
+    background-color: var(--dark);
+    padding: 10px 0;
+    text-align: left;
+    position: relative;
+  }
+  
+  .phpmyadmin-button {
+    background-color: var(--secondary);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+    margin-left: 20px;
+    font-size: 14px;
+  }
+  
+  .phpmyadmin-button:hover {
+    background-color: var(--secondary-dark);
+  }
+  
+  .phpmyadmin-button:active {
+    background-color: var(--secondary-dark);
+  }
+  
+  

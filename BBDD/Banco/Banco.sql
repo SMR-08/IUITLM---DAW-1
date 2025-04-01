@@ -1,4 +1,4 @@
--- File: database/init/init.sql
+-- File: BBDD/Bacno/Banco.sql
 
 -- Switch to the target database
 USE Banco;

@@ -1,7 +1,4 @@
-/* Theme CSS - Light and Dark Mode */
-
 :root {
-  /* Light theme variables (default) */
   --bg-color: #ffffff;
   --text-color: #333333;
   --heading-color: #0066cc;
@@ -14,33 +11,26 @@
   --icon-color: #555555;
   --icon-hover-color: #0066cc;
   --card-bg: #f8f8f8;
-  --highlight-color: #0066cc; /* Added for highlighted text */
-  
-  /* Animation duration */
+  --highlight-color: #0066cc;
   --theme-transition: 0.5s;
-  
-  /* Base font size - increased by another 3px */
-  font-size: calc(16px + 6px); /* Increased from 16px + 3px to 16px + 6px */
+  font-size: calc(16px + 6px);
 }
 
-/* Dark theme variables - improved with less monochromatic colors */
 [data-theme="dark"] {
-  --bg-color: #262626; /* Changed from #121212 to #262626 */
-  --text-color: #ffffff; /* Changed to pure white */
-  --heading-color: #0091d8; /* Changed to #0091d8 */
-  --subheading-color: #ffffff; /* Changed to white instead of gray */
-  --nav-color: #ffffff; /* Changed to white */
-  --nav-hover-color: #0091d8; /* Changed to #0091d8 */
-  --nav-underline-color: #0091d8; /* Changed to #0091d8 */
-  --muted-color: #e0e0e0; /* Lighter color instead of gray */
-  --border-color: #444444; /* Slightly lighter border */
-  --icon-color: #ffffff; /* Changed to white */
-  --icon-hover-color: #0091d8; /* Changed to #0091d8 */
-  --card-bg: #333333; /* Slightly lighter background */
-  --highlight-color: #0091d8; /* Added for highlighted text in dark mode */
+  --bg-color: #262626;
+  --text-color: #ffffff;
+  --heading-color: #0091d8;
+  --subheading-color: #ffffff;
+  --nav-color: #ffffff;
+  --nav-hover-color: #0091d8;
+  --nav-underline-color: #0091d8;
+  --muted-color: #e0e0e0;
+  --border-color: #444444;
+  --icon-color: #ffffff;
+  --icon-hover-color: #0091d8;
+  --card-bg: #333333;
+  --highlight-color: #0091d8;
 }
-
-/* Apply transition to all elements for smooth theme switching */
 * {
   transition: background-color var(--theme-transition) ease,
               color var(--theme-transition) ease,
@@ -48,7 +38,6 @@
               box-shadow var(--theme-transition) ease;
 }
 
-/* Apply theme colors */
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -58,7 +47,6 @@ body {
   background-color: var(--bg-color);
 }
 
-/* Headings */
 .title-body h2 {
   color: var(--heading-color);
 }
@@ -67,7 +55,6 @@ body {
   color: var(--subheading-color);
 }
 
-/* Navigation */
 .nav.navbar-nav > li > a {
   color: var(--nav-color);
 }
@@ -81,18 +68,15 @@ body {
   background-color: var(--nav-underline-color);
 }
 
-/* Reference number */
 .reference-number p {
   color: var(--muted-color);
 }
 
-/* Footer */
 .footer-index {
   border-top-color: var(--border-color);
   background-color: var(--bg-color);
 }
 
-/* Social media icons */
 .enlaces-rss a.social-link {
   color: var(--icon-color);
 }
@@ -101,7 +85,6 @@ body {
   color: var(--icon-hover-color);
 }
 
-/* Mobile navigation */
 .navbar-toggle {
   border-color: var(--border-color);
 }
@@ -114,7 +97,6 @@ body {
   color: var(--muted-color);
 }
 
-/* Theme toggle and language selector container */
 .top-controls {
   position: absolute;
   top: 10px;
@@ -124,7 +106,6 @@ body {
   align-items: center;
 }
 
-/* Theme toggle button */
 .theme-toggle {
   display: flex;
   align-items: center;
@@ -145,7 +126,6 @@ body {
   transform: rotate(15deg);
 }
 
-/* Separator line */
 .control-separator {
   height: 20px;
   width: 1px;
@@ -153,19 +133,16 @@ body {
   margin: 0 10px;
 }
 
-/* Language selector adjustments */
 .enlaces-lang {
   position: static;
   display: flex;
   align-items: center;
 }
 
-/* Dark mode adjustments for images */
 [data-theme="dark"] img.partner-logo {
-  filter: brightness(1.1) contrast(1.1); /* Adjusted for better visibility on dark background */
+  filter: brightness(1.1) contrast(1.1);
 }
 
-/* Animation for theme toggle icon */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -175,14 +152,12 @@ body {
   animation: spin 0.5s ease-in-out;
 }
 
-/* Styling for highlighted text */
 ins {
   color: var(--highlight-color);
-  text-decoration: none; /* Remove the default underline */
-  font-weight: 500; /* Make it slightly bolder */
+  text-decoration: none;
+  font-weight: 500;
 }
 
-/* Responsive adjustments */
 @media (max-width: 480px) {
   .top-controls {
     position: relative;

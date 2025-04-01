@@ -1,10 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Test</title>
+    <meta charset="UTF-8">
+    <title>Hub de Ejercicios API</title>
+    <!-- Podrías enlazar a un CSS común o añadir estilos aquí -->
+    <link rel="stylesheet" href="css/estilos.css"> <!-- Usando el mismo CSS del banco -->
+    <style>
+        body { font-family: sans-serif; }
+        .ejercicio-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .ejercicio-container h2 { margin-top: 0; }
+        #inventario-lista li { margin-bottom: 5px; }
+        #inventario-valor { font-weight: bold; }
+        .output-area {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            min-height: 50px;
+            white-space: pre-wrap; /* Para mostrar saltos de línea y espacios */
+            font-family: monospace;
+        }
+        .mensaje { /* Estilos para mensajes de éxito/error */
+            padding: 10px; margin-top: 10px; border-radius: 4px; display: none;
+        }
+        .mensaje.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .mensaje.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .visible { display: block !important; }
+        /* Añadir algún estilo a los formularios */
+        .form-inline .form-group { margin-right: 10px; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
-    <h1>Funciona!!!!!</h1>
-    <button onclick="location.href='registro.html'">Ir a registro.html</button>
+    <header>
+         <div class="header-content container">
+             <div class="logo">Hub de Ejercicios</div>
+             <!-- Podríamos añadir navegación si crece mucho -->
+         </div>
+     </header>
+
+    <main class="container">
+        <h1>Prueba de Endpoints de Ejercicios</h1>
+
+        <!-- --- Ejercicio 1: Inventario --- -->
+        <div class="ejercicio-container">
+            <h2>Ejercicio 1: Inventario de Productos</h2>
+            <p>Gestiona un inventario simple en memoria usando la API.</p>
+
+            <button id="btn-ver-inventario" class="btn btn-info">Ver Inventario Actual</button>
+
+            <div id="inventario-output" class="output-area" style="margin-top:10px;">
+                <!-- Aquí se mostrará el inventario -->
+                Pulsa "Ver Inventario" para cargar los datos...
+            </div>
+             <div id="mensaje-inventario" class="mensaje"></div>
+
+
+            <hr style="margin: 20px 0;">
+
+            <h4>Agregar Producto</h4>
+            <form id="form-agregar-producto" class="form-inline">
+                <div class="form-group">
+                    <label for="prod-nombre">Nombre:</label>
+                    <input type="text" id="prod-nombre" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="prod-precio">Precio:</label>
+                    <input type="number" id="prod-precio" step="0.01" min="0" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="prod-cantidad">Cantidad:</label>
+                    <input type="number" id="prod-cantidad" step="1" min="0" required class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success">Agregar</button>
+            </form>
+             <div id="mensaje-agregar" class="mensaje"></div>
+
+
+            <hr style="margin: 20px 0;">
+
+            <h4>Eliminar Producto</h4>
+            <form id="form-eliminar-producto" class="form-inline">
+                <div class="form-group">
+                    <label for="prod-nombre-eliminar">Nombre a eliminar:</label>
+                    <input type="text" id="prod-nombre-eliminar" required class="form-control">
+                </div>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+             <div id="mensaje-eliminar" class="mensaje"></div>
+
+        </div>
+
+        <!-- --- Ejercicio 4: Banco --- -->
+        <div class="ejercicio-container">
+            <h2>Ejercicio 4: Aplicación Bancaria</h2>
+            <p>Accede a la aplicación web completa del banco.</p>
+            <!-- Asumiendo que banco.php está en la misma carpeta (www/) -->
+            <a href="banco.php" class="btn btn-primary">Ir a la Aplicación del Banco</a>
+        </div>
+
+        <!-- Puedes añadir más secciones para futuros ejercicios aquí -->
+
+    </main>
+
+    <!-- Incluir el JavaScript específico del Hub -->
+    <script src="js/hub.js"></script>
 </body>
 </html>
