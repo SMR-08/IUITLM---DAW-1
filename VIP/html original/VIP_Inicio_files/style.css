@@ -1,0 +1,385 @@
+/* Reset and base styles */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+  }
+  
+  html, body {
+	height: 100%;
+	min-height: 100%;
+  }
+  
+  body {
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+	line-height: 1.6;
+	color: #333;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+  }
+  
+  /* Scale up content for desktop screens by 25% */
+  @media (min-width: 992px) {
+	html {
+	  font-size: 125%; /* Increase base font size by 25% */
+	}
+  }
+  
+  .page-index {
+	max-width: 1200px;
+	width: 100%;
+	margin: 0 auto;
+	padding: 20px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh; /* Full viewport height */
+  }
+  
+  /* Language selector - positioned absolutely in the top right */
+  .enlaces-lang {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 100;
+  }
+  
+  .enlaces-lang a {
+	margin-left: 10px;
+	display: inline-block;
+  }
+  
+  .enlaces-lang img {
+	width: 24px;
+	height: auto;
+	border-radius: 3px;
+	transition: transform 0.2s;
+  }
+  
+  .enlaces-lang img:hover {
+	transform: scale(1.1);
+  }
+  
+  /* Header styles */
+  .head-index {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px 0 0;
+	margin-top: 30px;
+  }
+  
+  /* Logo - centered */
+  .logo-container {
+	text-align: center;
+	margin-bottom: 30px;
+  }
+  
+  .index {
+	display: inline-block;
+  }
+  
+  .index img {
+	max-width: 160px;
+	transition: transform 0.3s;
+  }
+  
+  .index img:hover {
+	transform: scale(1.05);
+  }
+  
+  /* Navigation - below the logo */
+  .menu-index {
+	width: 100%;
+  }
+  
+  .navbar-colored {
+	background-color: transparent;
+	border: none;
+  }
+  
+  .navbar-collapse {
+	text-align: center;
+  }
+  
+  .nav.navbar-nav {
+	display: inline-block;
+	float: none;
+  }
+  
+  .nav.navbar-nav > li {
+	display: inline-block;
+	float: none;
+	margin: 0 15px;
+  }
+  
+  .nav.navbar-nav > li > a {
+	color: #555;
+	font-weight: 500;
+	padding: 10px 0;
+	position: relative;
+	transition: color 0.3s;
+  }
+  
+  /* Special styling for Sistema VIP menu item - only size is different now */
+  .nav.navbar-nav > li.sistema-vip > a {
+	font-size: 150%; /* Increased to 150% (25% more than before) */
+	font-weight: 500; /* Same as other items */
+  }
+  
+  .nav.navbar-nav > li > a:hover,
+  .nav.navbar-nav > li.selected > a {
+	color: #0066cc;
+	background-color: transparent;
+  }
+  
+  .nav.navbar-nav > li > a:after {
+	content: '';
+	position: absolute;
+	width: 0;
+	height: 2px;
+	bottom: 0;
+	left: 0;
+	background-color: #0066cc;
+	transition: width 0.3s;
+  }
+  
+  .nav.navbar-nav > li > a:hover:after,
+  .nav.navbar-nav > li.selected > a:after {
+	width: 100%;
+  }
+  
+  /* Mobile navigation */
+  .navbar-toggle {
+	border: 1px solid #ddd;
+	margin-right: 0;
+  }
+  
+  .navbar-toggle .icon-bar {
+	background-color: #888;
+  }
+  
+  .mobile-nav-label {
+	color: gray;
+	float: right;
+	line-height: 50px;
+	display: none;
+  }
+  
+  @media (max-width: 767px) {
+	.mobile-nav-label {
+	  display: inline-block;
+	}
+  }
+  
+  /* Content styles */
+  .content-index {
+	padding: 40px 0;
+	flex: 0; /* Changed from 1 to 0 as requested */
+  }
+  
+  .content-head {
+	text-align: center;
+	margin-bottom: 40px;
+  }
+  
+  .title-body {
+	margin: 0 auto;
+  }
+  
+  .title-body h2 {
+	font-size: 36px;
+	font-weight: 700;
+	margin-bottom: 10px;
+	color: #0066cc;
+  }
+  
+  .title-body h4 {
+	font-size: 20px;
+	font-weight: 400;
+	margin-bottom: 5px;
+	color: #555;
+  }
+  
+  .content-body {
+	max-width: 800px;
+	margin: 0 auto;
+  }
+  
+  /* Added specific font-size for text-content */
+  .text-content {
+	font-size: 20px;
+  }
+  
+  .text-content p {
+	margin-bottom: 20px;
+	text-align: justify;
+  }
+  
+  /* Reference number styling - removed margin-bottom */
+  .reference-number {
+	text-align: center;
+	margin-top: 30px;
+  }
+  
+  .reference-number p {
+	font-size: 14px;
+	color: #777;
+	font-weight: 400;
+  }
+  
+  /* Footer styles - removed margin: 0 auto */
+  .footer-index {
+	display: flex;
+	align-items: center;
+	padding: 30px 0;
+	margin-top: 20px;
+	border-top: 1px solid #eee;
+	gap: 5%; /* Reduced spacing between social media and logos */
+  }
+  
+  /* Updated footer positioning for desktop - changed from fixed to relative */
+  @media (min-width: 992px) {
+	.footer-index {
+	  position: relative; /* Changed from fixed to relative */
+	  bottom: auto;
+	  left: auto;
+	  right: auto;
+	  background-color: #fff;
+	  z-index: 100;
+	  width: 100%;
+	  max-width: 1200px;
+	  transform: none; /* Removed transform */
+	}
+	
+	/* Removed padding-bottom from page-index since footer is no longer fixed */
+	.page-index {
+	  padding-bottom: 0;
+	}
+  }
+  
+  /* Social media links - now in the footer */
+  .footer-social {
+	flex: 0; /* Changed from 1 to 0 as requested */
+  }
+  
+  .enlaces-rss {
+	display: flex;
+  }
+  
+  .enlaces-rss a.social-link {
+	display: inline-block;
+	margin-right: 15px;
+	color: #555;
+	font-size: 22px;
+	transition: color 0.3s;
+  }
+  
+  /* Remove margin-right from the last social link */
+  .enlaces-rss a.social-link.last {
+	margin-right: 0;
+  }
+  
+  .enlaces-rss a.social-link:hover {
+	color: #0066cc;
+  }
+  
+  /* Partner logos */
+  .footer-logos {
+	display: flex;
+	flex: 2;
+	justify-content: space-around;
+  }
+  
+  .logo-item {
+	text-align: center;
+	padding: 0 15px;
+  }
+  
+  /* Direct image styling for partner logos */
+  .partner-logo {
+	height: auto;
+	max-height: 60px;
+	max-width: 230px; /* Increased from 120px to 230px */
+	transition: transform 0.3s;
+  }
+  
+  /* Prevent partner logos from being scaled up with the rest of the content */
+  @media (min-width: 992px) {
+	.partner-logo {
+	  transform: scale(0.8); /* Scale down to counteract the overall scaling */
+	}
+	
+	.partner-logo:hover {
+	  transform: scale(0.84); /* Maintain the hover effect */
+	}
+  }
+  
+  .partner-logo:hover {
+	transform: scale(1.05);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 770px) {
+	.nav.navbar-nav > li {
+	  margin: 0 10px;
+	}
+	
+	.footer-index {
+	  flex-direction: column;
+	  gap: 30px;
+	  position: static; /* Ensure footer is not fixed on mobile */
+	}
+	
+	.footer-social {
+	  margin-bottom: 0;
+	  text-align: center;
+	}
+	
+	.enlaces-rss {
+	  justify-content: center;
+	}
+	
+	/* Increased margin and size for social links on mobile */
+	.enlaces-rss a.social-link {
+	  margin-right: 25px; /* Increased from 15px */
+	  font-size: 26px; /* Increased by 20% from 22px */
+	}
+	
+	.footer-logos {
+	  flex-direction: column;
+	  gap: 20px;
+	}
+	
+	.logo-item {
+	  margin-bottom: 0;
+	}
+	
+	.title-body h2 {
+	  font-size: 28px;
+	}
+	
+	.title-body h4 {
+	  font-size: 18px;
+	}
+  }
+  
+  @media (max-width: 480px) {
+	.enlaces-lang {
+	  position: relative;
+	  top: 0;
+	  right: 0;
+	  text-align: center;
+	  margin-bottom: 20px;
+	}
+	
+	.nav.navbar-nav > li {
+	  display: block;
+	  margin: 10px 0;
+	}
+	
+	.head-index {
+	  margin-top: 10px;
+	}
+  }

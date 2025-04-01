@@ -48,13 +48,14 @@ services:
     environment:
       # Variables de entorno para configurar MariaDB.
       MARIADB_ROOT_PASSWORD: mht85  # Contraseña del usuario root.
-      MARIADB_DATABASE: bbdd  # Nombre de la base de datos a crear.
+      MARIADB_DATABASE: Banco  # Nombre de la base de datos a crear.
       MARIADB_USER: mht  # Nombre del usuario de la base de datos.
       MARIADB_PASSWORD: mht  # Contraseña del usuario de la base de datos.
     networks:
       - red_www  # Conecta el contenedor MariaDB a la red 'red_www'.
     volumes:
       - mariadb_data:/var/lib/mysql  # Monta un volumen con nombre 'mariadb_data' para guardar los datos de forma persistente.
+      - ./BBDD/Banco:/docker-entrypoint-initdb.d
 
   # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
   phpmyadmin:
@@ -92,8 +93,8 @@ services:
       - mariadb  # La API depende de MariaDB
     environment:
       - DB_HOST=mariadb          # Nombre del servicio MariaDB (para la conexión)
-      - DB_USER=root            # Usuario de MariaDB (root para simplificar, considera un usuario dedicado)
-      - DB_PASSWORD=mht85     # Contraseña de MariaDB (¡CAMBIA ESTO EN PRODUCCION!)
+      - DB_USER=mht            # Usuario de MariaDB (root para simplificar, considera un usuario dedicado)
+      - DB_PASSWORD=mht     # Contraseña de MariaDB (¡CAMBIA ESTO EN PRODUCCION!)
       - DB_NAME=Banco            # Nombre de la base de datos para Python
     volumes:
       - ./API/Python:/app  # Monta el código de Python
