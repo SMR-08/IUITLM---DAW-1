@@ -49,18 +49,21 @@ services:
   # Servicio para la base de datos MariaDB.
   mariadb:
     container_name: mariadb
-    image: mariadb:latest  # Usa la última imagen oficial de MariaDB.
+    image: mariadb:latest
     environment:
-      # Variables de entorno para configurar MariaDB.
-      MARIADB_ROOT_PASSWORD: mht85  # Contraseña del usuario root.
-      MARIADB_DATABASE: Banco  # Nombre de la base de datos a crear.
-      MARIADB_USER: mht  # Nombre del usuario de la base de datos.
-      MARIADB_PASSWORD: mht  # Contraseña del usuario de la base de datos.
+      # El entrypoint usa estas para crear el *primer* usuario/db si se definen.
+      # Podríamos omitir MARIADB_USER/PASSWORD/DATABASE aquí y crear *todo* en el SQL,
+      # pero mantenerlas puede ser útil si alguna herramienta espera esa DB/user inicial.
+      # OJO: El usuario creado aquí (si se define MARIADB_USER) tendrá privilegios sobre MARIADB_DATABASE.
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_BANCO_NAME}
+      MARIADB_USER: ${DB_BANCO_USER}
+      MARIADB_PASSWORD: ${DB_BANCO_PASSWORD}
     networks:
-      - red_www  # Conecta el contenedor MariaDB a la red 'red_www'.
+      - red_www
     volumes:
-      - mariadb_data:/var/lib/mysql  # Monta un volumen con nombre 'mariadb_data' para guardar los datos de forma persistente.
-      # Monta scripts de inicialización de la BBDD.
+      - mariadb_data:/var/lib/mysql
+      # El script SQL ahora creará los usuarios específicos y otorgará permisos
       - ./BBDD/Banco:/docker-entrypoint-initdb.d
 
   # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
@@ -91,24 +94,31 @@ services:
     # y Nginx accede a ella a través de la configuración montada en el servicio nginx.
 
   # Servicio para la API de Python.
+  # Servicio para la API de Python.
   python-api:
     container_name: python-api
     build:
-      context: ./API  # Contexto donde está el api.dockerfile y la carpeta Python.
-      dockerfile: api.dockerfile # Usa el archivo renombrado 'api.dockerfile'.
+      context: ./API
+      dockerfile: api.dockerfile
     ports:
-      - "5000:8000"  # Mapea el puerto 5000 del host al 8000 del contenedor (Gunicorn).
+      - "${API_PORT_HOST:-5000}:${API_PORT_CONTAINER:-8000}" # Usa defaults si no están en .env
     networks:
       - red_www
     depends_on:
-      - mariadb  # La API depende de MariaDB.
+      mariadb:
+        condition: service_healthy # Espera a que MariaDB esté saludable si defines healthcheck
+        # condition: service_started # O simplemente espera a que inicie
     environment:
-      - DB_HOST=mariadb          # Nombre del servicio MariaDB (para la conexión).
-      - DB_USER=mht              # Usuario de MariaDB.
-      - DB_PASSWORD=mht          # Contraseña de MariaDB.
-      - DB_NAME=Banco            # Nombre de la base de datos.
+      # Pasar TODAS las credenciales necesarias a la API
+      - DB_HOST=${DB_HOST}
+      - DB_BANCO_NAME=${DB_BANCO_NAME}
+      - DB_BANCO_USER=${DB_BANCO_USER}
+      - DB_BANCO_PASSWORD=${DB_BANCO_PASSWORD}
+      - DB_INVENTARIO_NAME=${DB_INVENTARIO_NAME}
+      - DB_INVENTARIO_USER=${DB_INVENTARIO_USER}
+      - DB_INVENTARIO_PASSWORD=${DB_INVENTARIO_PASSWORD}
+      # - FLASK_DEBUG=${FLASK_DEBUG:-false} # Usa default si no está en .env
     volumes:
-       # Monta el código fuente de la API. No se necesita COPY en el Dockerfile para esto.
       - ./API/Python:/app
 
 # Define los volúmenes que se van a usar.
