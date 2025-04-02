@@ -23,6 +23,7 @@ class CuentaJoven (Cuenta):
         super().__init__(titular, cantidad)
         self.bonificacion = bonificacion
         self.edad = edad
+    
     def get_bonificacion(self):
         """Getter para la bonificación."""
         return self.bonificacion
@@ -30,6 +31,7 @@ class CuentaJoven (Cuenta):
     def set_bonificacion(self, bonificacion):
         """Setter para la bonificación."""
         self.bonificacion = bonificacion
+    
     def get_edad(self):
         """Getter para la edad."""
         return self.edad
