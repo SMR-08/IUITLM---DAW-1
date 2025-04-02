@@ -28,7 +28,7 @@ try:
         insertar_elemento,
         actualizar_elemento,
         eliminar_elemento,
-        ErrorBaseDatos # Importar la clase de excepción REAL
+        ErrorBaseDatos
     )
     logging.info("Módulo db.py importado correctamente.")
 except ImportError:
