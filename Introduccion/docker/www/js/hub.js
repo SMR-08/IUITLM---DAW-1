@@ -59,11 +59,19 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 html += '<ul id="inventario-lista">';
                 data.productos.forEach(p => {
-                    html += `<li>${p.nombre} - Precio: ${p.precio.toFixed(2)}€ - Cantidad: ${p.cantidad}</li>`;
-                });
+                    // Convertimos el precio del producto a número para asegurar, aunque tu código ya lo hace bien
+                    const precioProductoNum = parseFloat(p.precio);
+                    const precioProductoFormateado = !isNaN(precioProductoNum) ? precioProductoNum.toFixed(2) : 'N/A';
+                    html += `<li>${p.nombre} - Precio: ${precioProductoFormateado}€ - Cantidad: ${p.cantidad}</li>`;
+               });
                 html += '</ul>';
             }
-            html += `<p><strong>Valor Total del Inventario:</strong> <span id="inventario-valor">${data.valor_total.toFixed(2)}€</span></p>`;
+            const valorTotalNumerico = parseFloat(data.valor_total);
+
+            const valorTotalFormateado = !isNaN(valorTotalNumerico) ? valorTotalNumerico.toFixed(2) : '0.00';
+            
+            html += `<p><strong>Valor Total del Inventario:</strong> <span id="inventario-valor">${valorTotalFormateado}€</span></p>`;
+            
             inventarioOutputDiv.innerHTML = html;
             // Mostrar mensaje de éxito si la API lo envió
             if (data.mensaje) {

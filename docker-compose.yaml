@@ -51,10 +51,6 @@ services:
     container_name: mariadb
     image: mariadb:latest
     environment:
-      # El entrypoint usa estas para crear el *primer* usuario/db si se definen.
-      # Podríamos omitir MARIADB_USER/PASSWORD/DATABASE aquí y crear *todo* en el SQL,
-      # pero mantenerlas puede ser útil si alguna herramienta espera esa DB/user inicial.
-      # OJO: El usuario creado aquí (si se define MARIADB_USER) tendrá privilegios sobre MARIADB_DATABASE.
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_BANCO_NAME}
       MARIADB_USER: ${DB_BANCO_USER}
@@ -63,7 +59,6 @@ services:
       - red_www
     volumes:
       - mariadb_data:/var/lib/mysql
-      # El script SQL ahora creará los usuarios específicos y otorgará permisos
       - ./BBDD/Banco:/docker-entrypoint-initdb.d
 
   # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
@@ -94,22 +89,18 @@ services:
     # y Nginx accede a ella a través de la configuración montada en el servicio nginx.
 
   # Servicio para la API de Python.
-  # Servicio para la API de Python.
   python-api:
     container_name: python-api
     build:
       context: ./API
       dockerfile: api.dockerfile
     ports:
-      - "${API_PORT_HOST:-5000}:${API_PORT_CONTAINER:-8000}" # Usa defaults si no están en .env
+      - "${API_PORT_HOST:-5000}:${API_PORT_CONTAINER:-8000}"
     networks:
       - red_www
     depends_on:
-      mariadb:
-        condition: service_healthy # Espera a que MariaDB esté saludable si defines healthcheck
-        # condition: service_started # O simplemente espera a que inicie
+      - mariadb
     environment:
-      # Pasar TODAS las credenciales necesarias a la API
       - DB_HOST=${DB_HOST}
       - DB_BANCO_NAME=${DB_BANCO_NAME}
       - DB_BANCO_USER=${DB_BANCO_USER}
@@ -117,14 +108,10 @@ services:
       - DB_INVENTARIO_NAME=${DB_INVENTARIO_NAME}
       - DB_INVENTARIO_USER=${DB_INVENTARIO_USER}
       - DB_INVENTARIO_PASSWORD=${DB_INVENTARIO_PASSWORD}
-      # - FLASK_DEBUG=${FLASK_DEBUG:-false} # Usa default si no está en .env
     volumes:
       - ./API/Python:/app
 
-# Define los volúmenes que se van a usar.
 volumes:
-  mariadb_data:  # Volumen persistente para los datos de MariaDB.
-
-# Define las redes que se utilizarán.
+  mariadb_data:
 networks:
-  red_www:  # Red para la comunicación entre los contenedores.
+  red_www: 

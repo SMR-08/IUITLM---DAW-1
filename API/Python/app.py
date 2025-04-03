@@ -126,18 +126,51 @@ def obtener_inventario_bd():
         )
         # ... (resto de la lógica igual) ...
         # (Cálculo de valor_total y formateo de productos_respuesta)
-        valor_total = sum(Decimal(str(p.get('precio', 0))) * Decimal(p.get('cantidad', 0)) for p in productos_bd)
-        productos_respuesta = [
-            {'id': p.get('id'), 'nombre': p.get('nombre'), 'precio': str(p.get('precio', '0.00')), 'cantidad': p.get('cantidad', 0)}
-            for p in productos_bd
-        ]
-        return jsonify({'productos': productos_respuesta, 'valor_total': str(valor_total), 'mensaje': 'Inventario OK'}), 200
+        valor_total =  Decimal('0.00')
+        productos_respuesta = []
+
+        for p in productos_bd:
+            # Asegurar que el precio se maneja como Decimal, incluso si viene mal de DB
+            try:
+                precio_decimal = Decimal(str(p.get('precio', '0.00')))
+            except InvalidOperation:
+                log.warning(f"Precio inválido '{p.get('precio')}' en BD para producto ID {p.get('id')}, usando 0.00")
+                precio_decimal = Decimal('0.00')
+
+            # Asegurar cantidad es entero >= 0
+            try:
+                cantidad_int = int(p.get('cantidad', 0))
+                if cantidad_int < 0:
+                    log.warning(f"Cantidad negativa '{p.get('cantidad')}' en BD para producto ID {p.get('id')}, usando 0")
+                    cantidad_int = 0
+            except (ValueError, TypeError):
+                 log.warning(f"Cantidad inválida '{p.get('cantidad')}' en BD para producto ID {p.get('id')}, usando 0")
+                 cantidad_int = 0
+                 valor_total += precio_decimal * Decimal(cantidad_int)
+
+            # Mantenemos el precio individual como STRING para la lista de productos,
+            # ya que hub.js usa parseFloat(p.precio) y funciona bien.
+            productos_respuesta.append({
+                'id': p.get('id'),
+                'nombre': p.get('nombre'),
+                'precio': str(precio_decimal),
+                'cantidad': cantidad_int
+            })
+
+        # Enviamos valor_total como float (número JSON) en lugar de string.
+        return jsonify({
+            'productos': productos_respuesta,
+            'valor_total': float(valor_total),
+            'mensaje': 'Inventario OK'
+        }), 200
+
     except ErrorBaseDatos as e:
         log.error(f"Error BD ({INVENTARIO_DB_CONFIG['name']}) en GET /inventario: {e}", exc_info=True)
         return jsonify({'error': f'Error BD: {str(e)}'}), 500
     except Exception as e:
         log.exception(f"Error inesperado GET /inventario ({INVENTARIO_DB_CONFIG['name']}): {e}")
         return jsonify({'error': 'Error interno'}), 500
+
 
 @app.route('/inventario/productos', methods=['POST'])
 def agregar_producto_inventario_bd():
