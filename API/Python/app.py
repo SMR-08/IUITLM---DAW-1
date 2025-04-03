@@ -72,18 +72,26 @@ INVENTARIO_DB_CONFIG = {
     "user": os.environ.get("DB_INVENTARIO_USER"),
     "pass": os.environ.get("DB_INVENTARIO_PASSWORD")
 }
+
+COCHES_DB_CONFIG = {
+    "host": DB_HOST,
+    "name": os.environ.get("DB_COCHES_NAME"),
+    "user": os.environ.get("DB_COCHES_USER"),
+    "pass": os.environ.get("DB_COCHES_PASSWORD")
+}
 # Validar que las configuraciones esenciales están presentes
-if not all(BANCO_DB_CONFIG.values()) or not all(INVENTARIO_DB_CONFIG.values()) or not DB_HOST:
+if not all(BANCO_DB_CONFIG.values()) or not all(INVENTARIO_DB_CONFIG.values()) or not all(COCHES_DB_CONFIG.values()) or not DB_HOST:
     log.critical("¡Faltan variables de entorno críticas para la configuración de la base de datos!")
     # Podrías lanzar una excepción aquí para evitar que la app inicie incorrectamente
     # raise EnvironmentError("Faltan variables de entorno de BD")
     # O simplemente loguearlo y esperar fallos posteriores
     log.warning(f"Banco Config Check: {BANCO_DB_CONFIG}")
     log.warning(f"Inventario Config Check: {INVENTARIO_DB_CONFIG}")
-
+    log.warning(f"Coches Config Check: {COCHES_DB_CONFIG}") # Añadido log
 
 log.info(f"Configuración BD Banco: Host={BANCO_DB_CONFIG['host']}, DB={BANCO_DB_CONFIG['name']}, User={BANCO_DB_CONFIG['user']}")
 log.info(f"Configuración BD Inventario: Host={INVENTARIO_DB_CONFIG['host']}, DB={INVENTARIO_DB_CONFIG['name']}, User={INVENTARIO_DB_CONFIG['user']}")
+log.info(f"Configuración BD Coches: Host={COCHES_DB_CONFIG['host']}, DB={COCHES_DB_CONFIG['name']}, User={COCHES_DB_CONFIG['user']}")
 
 # --- Funciones Auxiliares ---
 def obtener_instancia_cuenta(id_cuenta: int) -> Union[Cuenta, CuentaJoven, None]:
@@ -406,6 +414,126 @@ def api_registro_usuario():
         log.exception(f"Error inesperado /apiregistro ({BANCO_DB_CONFIG['name']}): {e}")
         return jsonify({'error': 'Error interno'}), 500
 
+@app.route('/coches', methods=['GET'])
+def obtener_coches():
+    """Obtiene todos los coches de la base de datos."""
+    db_name = COCHES_DB_CONFIG['name']
+    log.info(f"GET /coches (DB: {db_name})")
+    try:
+        # Ordenar por ID o por marca/modelo/año
+        coches_bd = obtener_todos_los_elementos(
+            'Vehiculos',
+            db_config=COCHES_DB_CONFIG,
+            orden=[('marca', 'ASC'), ('modelo', 'ASC')]
+        )
+        # No es necesario convertir nada, enviar tal cual
+        return jsonify({'coches': coches_bd, 'mensaje': f'Coches obtenidos desde {db_name}'}), 200
+    except ErrorBaseDatos as e:
+        log.error(f"Error BD ({db_name}) en GET /coches: {e}", exc_info=True)
+        return jsonify({'error': f'Error BD al obtener coches: {str(e)}'}), 500
+    except Exception as e:
+        log.exception(f"Error inesperado GET /coches ({db_name}): {e}")
+        return jsonify({'error': 'Error interno al obtener coches'}), 500
+
+@app.route('/coches', methods=['POST'])
+def agregar_coche():
+    """Agrega un nuevo coche a la base de datos."""
+    db_name = COCHES_DB_CONFIG['name']
+    log.info(f"POST /coches (DB: {db_name})")
+    try:
+        datos = request.get_json()
+        if not datos or not all(k in datos for k in ['marca', 'modelo', 'año']):
+            log.warning(f"POST /coches ({db_name}) incompleto.")
+            return jsonify({'error': 'Faltan datos: marca, modelo y año requeridos'}), 400
+
+        marca = datos['marca'].strip()
+        modelo = datos['modelo'].strip()
+        try:
+            año = int(datos['año'])
+            # Validación simple del año (puedes ajustar los límites)
+            if not (1886 <= año <= 2100):
+                raise ValueError("Año fuera de rango razonable")
+        except (ValueError, TypeError):
+            log.warning(f"Año inválido: {datos.get('año')}")
+            return jsonify({'error': 'Año inválido (debe ser un número entero razonable)'}), 400
+
+        if not marca or not modelo:
+             log.warning(f"Marca o modelo vacío POST /coches ({db_name})")
+             return jsonify({'error': 'Marca y modelo no pueden estar vacíos'}), 400
+
+        datos_coche_bd = {'marca': marca, 'modelo': modelo, 'año': año}
+
+        # Intentar insertar en la BD
+        id_nuevo_coche = insertar_elemento(
+            'Vehiculos',
+            datos_coche_bd,
+            db_config=COCHES_DB_CONFIG
+        )
+        log.info(f"Coche agregado BD ({db_name}): ID={id_nuevo_coche}, {marca} {modelo}")
+        # Devolver el coche creado incluyendo su ID
+        coche_creado = {'id': id_nuevo_coche, **datos_coche_bd}
+        return jsonify({
+            'mensaje': f'Coche "{marca} {modelo}" agregado a {db_name}.',
+            'coche': coche_creado
+            }), 201 # 201 Created
+    except ErrorBaseDatos as e:
+        # Aquí podríamos tener un error si definimos UNIQUE constraints, pero no lo hemos hecho
+        log.error(f"Error BD ({db_name}) insertando coche: {e}", exc_info=True)
+        return jsonify({'error': f'Error BD al agregar coche: {str(e)}'}), 500
+    except Exception as e:
+        log.exception(f"Error inesperado POST /coches ({db_name}): {e}")
+        return jsonify({'error': 'Error interno al procesar la solicitud'}), 500
+
+@app.route('/coches/<int:id_coche>', methods=['GET'])
+def obtener_coche_por_id(id_coche):
+    """Obtiene un coche específico por su ID."""
+    db_name = COCHES_DB_CONFIG['name']
+    log.info(f"GET /coches/{id_coche} (DB: {db_name})")
+    try:
+        # Usar obtener_todos con filtro y límite 1 es una forma
+        resultado = obtener_todos_los_elementos(
+            'Vehiculos',
+            db_config=COCHES_DB_CONFIG,
+            filtro={'id': id_coche},
+            limite=1
+        )
+        if resultado:
+            return jsonify({'coche': resultado[0]}), 200
+        else:
+            log.warning(f"Coche con ID {id_coche} no encontrado en {db_name}")
+            return jsonify({'error': f'Coche con ID {id_coche} no encontrado'}), 404 # Not Found
+    except ErrorBaseDatos as e:
+        log.error(f"Error BD ({db_name}) en GET /coches/{id_coche}: {e}", exc_info=True)
+        return jsonify({'error': f'Error BD al obtener coche: {str(e)}'}), 500
+    except Exception as e:
+        log.exception(f"Error inesperado GET /coches/{id_coche} ({db_name}): {e}")
+        return jsonify({'error': 'Error interno al obtener coche'}), 500
+
+
+@app.route('/coches/<int:id_coche>', methods=['DELETE'])
+def eliminar_coche(id_coche):
+    """Elimina un coche por su ID."""
+    db_name = COCHES_DB_CONFIG['name']
+    log.info(f"DELETE /coches/{id_coche} (DB: {db_name})")
+    try:
+        eliminado = eliminar_elemento(
+            'Vehiculos',
+            'id', # Columna para identificar
+            id_coche, # Valor para identificar
+            db_config=COCHES_DB_CONFIG
+        )
+        if eliminado:
+            log.info(f"Coche eliminado BD ({db_name}): ID={id_coche}")
+            return jsonify({'mensaje': f'Coche con ID {id_coche} eliminado de {db_name}.'}), 200 # O 204 No Content si no devuelves mensaje
+        else:
+            log.warning(f"Intento eliminar coche no encontrado BD ({db_name}): ID={id_coche}")
+            return jsonify({'error': f'Coche con ID {id_coche} no encontrado.'}), 404 # Not Found
+    except ErrorBaseDatos as e:
+        log.error(f"Error BD ({db_name}) eliminando coche ID={id_coche}: {e}", exc_info=True)
+        return jsonify({'error': f'Error de base de datos al eliminar: {str(e)}'}), 500
+    except Exception as e:
+        log.exception(f"Error inesperado eliminando coche ID={id_coche} ({db_name}): {e}")
+        return jsonify({'error': 'Error interno al eliminar el coche'}), 500
 
 # --- Ejecución App (igual) ---
 if __name__ == '__main__':

@@ -19,6 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputNombreEliminar = document.getElementById('prod-nombre-eliminar');
     const mensajeEliminarDiv = document.getElementById('mensaje-eliminar');
 
+    const btnVerCoches = document.getElementById('btn-ver-coches');
+    const cochesOutputDiv = document.getElementById('coches-output');
+    const mensajeCochesDiv = document.getElementById('mensaje-coches');
+
+    const formAgregarCoche = document.getElementById('form-agregar-coche');
+    const inputCocheMarca = document.getElementById('coche-marca');
+    const inputCocheModelo = document.getElementById('coche-modelo');
+    const inputCocheAño = document.getElementById('coche-año');
+    const mensajeAgregarCocheDiv = document.getElementById('mensaje-agregar-coche');
+
+    const formEliminarCoche = document.getElementById('form-eliminar-coche');
+    const inputCocheIdEliminar = document.getElementById('coche-id-eliminar');
+    const mensajeEliminarCocheDiv = document.getElementById('mensaje-eliminar-coche');
+
     // --- Funciones Auxiliares ---
     function mostrarMensaje(divElement, texto, tipo = 'error') {
         if (divElement) {
@@ -31,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
         mensajeInventarioDiv.classList.remove('visible', 'success', 'error');
         mensajeAgregarDiv.classList.remove('visible', 'success', 'error');
         mensajeEliminarDiv.classList.remove('visible', 'success', 'error');
+        mensajeCochesDiv?.classList.remove('visible', 'success', 'error');
+        mensajeAgregarCocheDiv?.classList.remove('visible', 'success', 'error');
+        mensajeEliminarCocheDiv?.classList.remove('visible', 'success', 'error');
     }
 
     async function fetchApi(endpoint, options = {}) {
@@ -82,6 +99,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function renderizarCoches(data) {
+        if (!cochesOutputDiv) return;
+
+        if (data && data.coches) {
+            let html = '<h4>Lista de Coches:</h4>';
+            if (data.coches.length === 0) {
+                html += '<p>No hay coches registrados.</p>';
+            } else {
+                html += '<ul id="coches-lista">';
+                // Asumiendo que la API devuelve id, marca, modelo, año
+                data.coches.forEach(c => {
+                    html += `<li>ID: ${c.id} - ${c.marca} ${c.modelo} (${c.año})</li>`;
+                });
+                html += '</ul>';
+            }
+            cochesOutputDiv.innerHTML = html;
+            if (data.mensaje) { // Mostrar mensaje de éxito si viene de la API
+                mostrarMensaje(mensajeCochesDiv, data.mensaje, 'success');
+            }
+        } else {
+            cochesOutputDiv.innerHTML = '<p>No se pudieron cargar los datos de los coches.</p>';
+            mostrarMensaje(mensajeCochesDiv, 'Respuesta inesperada de la API.', 'error');
+        }
+    }
+
     // --- Lógica para Ver Inventario ---
     if (btnVerInventario) {
         btnVerInventario.addEventListener('click', async () => {
@@ -97,6 +139,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Lógica para Ver Coches (EJ2) ---
+    if (btnVerCoches) {
+        btnVerCoches.addEventListener('click', async () => {
+            ocultarMensajes();
+            cochesOutputDiv.textContent = 'Cargando coches...';
+            try {
+                const data = await fetchApi('/coches'); // Llama al nuevo endpoint GET /coches
+                renderizarCoches(data); // Usa la nueva función de renderizado
+            } catch (error) {
+                cochesOutputDiv.textContent = 'Error al cargar los coches.';
+                mostrarMensaje(mensajeCochesDiv, error.message || 'Error desconocido', 'error');
+            }
+        });
+    }
+    
     // --- Lógica para Agregar Producto ---
     if (formAgregar) {
         formAgregar.addEventListener('submit', async (e) => {
@@ -131,6 +188,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Lógica para Agregar Coche (EJ2) ---
+    if (formAgregarCoche) {
+        formAgregarCoche.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            ocultarMensajes();
+
+            const marca = inputCocheMarca.value.trim();
+            const modelo = inputCocheModelo.value.trim();
+            const año = parseInt(inputCocheAño.value, 10);
+
+            // Validación básica en cliente
+            if (!marca || !modelo || isNaN(año) || año < 1886 || año > 2100) {
+                mostrarMensaje(mensajeAgregarCocheDiv, 'Datos inválidos. Revisa marca, modelo y año.', 'error');
+                return;
+            }
+
+            const body = JSON.stringify({ marca, modelo, año });
+
+            try {
+                // Llama al nuevo endpoint POST /coches
+                const data = await fetchApi('/coches', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body
+                });
+                mostrarMensaje(mensajeAgregarCocheDiv, data.mensaje || 'Coche agregado.', 'success');
+                formAgregarCoche.reset(); // Limpiar formulario
+                // Refrescar lista automáticamente
+                if (btnVerCoches) btnVerCoches.click();
+            } catch (error) {
+                mostrarMensaje(mensajeAgregarCocheDiv, error.message || 'Error al agregar coche.', 'error');
+            }
+        });
+    }
+
     // --- Lógica para Eliminar Producto ---
     if (formEliminar) {
         formEliminar.addEventListener('submit', async (e) => {
@@ -156,6 +248,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnVerInventario.click();
             } catch (error) {
                 mostrarMensaje(mensajeEliminarDiv, error.message || 'Error al eliminar producto.', 'error');
+            }
+        });
+    }
+
+    // --- Lógica para Eliminar Coche por ID (EJ2) ---
+    if (formEliminarCoche) {
+        formEliminarCoche.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            ocultarMensajes();
+
+            const id = parseInt(inputCocheIdEliminar.value, 10);
+
+            if (isNaN(id) || id <= 0) {
+                mostrarMensaje(mensajeEliminarCocheDiv, 'Introduce un ID de coche válido (número entero positivo).', 'error');
+                return;
+            }
+
+            try {
+                 // Llama al nuevo endpoint DELETE /coches/<id>
+                const data = await fetchApi(`/coches/${id}`, {
+                    method: 'DELETE'
+                });
+                mostrarMensaje(mensajeEliminarCocheDiv, data.mensaje || 'Coche eliminado.', 'success');
+                formEliminarCoche.reset(); // Limpiar formulario
+                // Refrescar lista automáticamente
+                if (btnVerCoches) btnVerCoches.click();
+            } catch (error) {
+                 // Manejar el caso 404 (Not Found) específicamente si se desea
+                if (error.message && error.message.toLowerCase().includes('no encontrado')) {
+                     mostrarMensaje(mensajeEliminarCocheDiv, `Error: ${error.message}`, 'error');
+                } else {
+                     mostrarMensaje(mensajeEliminarCocheDiv, error.message || 'Error al eliminar coche.', 'error');
+                }
             }
         });
     }
