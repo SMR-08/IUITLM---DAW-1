@@ -3,6 +3,7 @@
 -- Crear Bases de Datos (si no existen)
 CREATE DATABASE IF NOT EXISTS Banco CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS InventarioDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS CochesDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Crear Usuarios Específicos (si no existen)
 -- ATENCIÓN: Reemplaza 'banco_secret_password' y 'inventario_secret_password' con las contraseñas
@@ -13,10 +14,12 @@ CREATE DATABASE IF NOT EXISTS InventarioDB CHARACTER SET utf8mb4 COLLATE utf8mb4
 -- Por simplicidad AHORA, las ponemos aquí, pero considera la alternativa .sh para producción.
 CREATE USER IF NOT EXISTS 'banquero'@'%' IDENTIFIED BY 'banco'; -- Usa la password del .env
 CREATE USER IF NOT EXISTS 'manager'@'%' IDENTIFIED BY 'inventario'; -- Usa la password del .env
+CREATE USER IF NOT EXISTS 'conductor'@'%' IDENTIFIED BY 'coches';
 
 -- Otorgar Permisos Específicos
 GRANT SELECT, INSERT, UPDATE, DELETE ON Banco.* TO 'banquero'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON InventarioDB.* TO 'manager'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON CochesDB.* TO 'conductor'@'%';
 -- Si necesitas más permisos (e.g., CREATE TABLE, ALTER TABLE desde la app), añádelos aquí.
 -- Evita GRANT ALL PRIVILEGES si no es estrictamente necesario.
 
@@ -53,3 +56,19 @@ CREATE TABLE IF NOT EXISTS ProductosInventario (
     CONSTRAINT chk_cantidad CHECK (cantidad >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE INDEX idx_nombre_producto ON ProductosInventario (nombre);
+
+USE CochesDB;
+
+CREATE TABLE IF NOT EXISTS Vehiculos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    marca VARCHAR(255) NOT NULL,
+    modelo VARCHAR(255) NOT NULL,
+    año INT NOT NULL -- Almacena el año como un número entero
+    -- No se definen constraints UNIQUE por defecto, permitiendo varios coches iguales
+    -- Se podrían añadir índices si se prevén búsquedas frecuentes por marca/modelo/año
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Índice opcional para búsquedas o ordenación por marca y modelo
+CREATE INDEX idx_marca_modelo ON Vehiculos (marca, modelo);
+-- Índice opcional para búsquedas o ordenación por año
+CREATE INDEX idx_año ON Vehiculos (año);

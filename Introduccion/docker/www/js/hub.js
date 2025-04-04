@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputCocheIdEliminar = document.getElementById('coche-id-eliminar');
     const mensajeEliminarCocheDiv = document.getElementById('mensaje-eliminar-coche');
 
+    const btnObtenerSonidos = document.getElementById('btn-obtener-sonidos');
+    const sonidosOutputDiv = document.getElementById('sonidos-output');
+    const mensajeSonidosDiv = document.getElementById('mensaje-sonidos');
+
     // --- Funciones Auxiliares ---
     function mostrarMensaje(divElement, texto, tipo = 'error') {
         if (divElement) {
@@ -48,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mensajeCochesDiv?.classList.remove('visible', 'success', 'error');
         mensajeAgregarCocheDiv?.classList.remove('visible', 'success', 'error');
         mensajeEliminarCocheDiv?.classList.remove('visible', 'success', 'error');
+        mensajeSonidosDiv?.classList.remove('visible', 'success', 'error');
     }
 
     async function fetchApi(endpoint, options = {}) {
@@ -124,6 +129,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+function renderizarSonidos(data) {
+    if (!sonidosOutputDiv) return;
+
+    if (data && data.sonidos) {
+        let html = '<h4>Sonidos Generados:</h4>';
+        if (data.sonidos.length === 0) {
+            html += '<p>No se generaron sonidos.</p>';
+        } else {
+            html += '<ul id="sonidos-lista">';
+            // data.sonidos es ahora una lista de objetos {tipo: ..., sonido: ...}
+            data.sonidos.forEach(s => {
+                // Escapamos HTML simple por si acaso en tipo/sonido (aunque aquí no debería haber)
+                const tipoEscapado = s.tipo.replace(/</g, "<").replace(/>/g, ">");
+                const sonidoEscapado = s.sonido.replace(/</g, "<").replace(/>/g, ">");
+                html += `<li><strong>${tipoEscapado}:</strong> ${sonidoEscapado}</li>`;
+            });
+            html += '</ul>';
+        }
+        sonidosOutputDiv.innerHTML = html;
+        if (data.mensaje) { // Mostrar mensaje de éxito si viene de la API
+            mostrarMensaje(mensajeSonidosDiv, data.mensaje, 'success');
+        }
+    } else {
+        sonidosOutputDiv.innerHTML = '<p>No se pudieron cargar los datos de los sonidos.</p>';
+        mostrarMensaje(mensajeSonidosDiv, 'Respuesta inesperada de la API.', 'error');
+    }
+}
+
+
+
     // --- Lógica para Ver Inventario ---
     if (btnVerInventario) {
         btnVerInventario.addEventListener('click', async () => {
@@ -154,6 +189,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    if (btnObtenerSonidos) {
+        btnObtenerSonidos.addEventListener('click', async () => {
+            ocultarMensajes();
+            sonidosOutputDiv.textContent = 'Generando sonidos...';
+            try {
+                // Llama al nuevo endpoint GET /animales/sonidos
+                const data = await fetchApi('/animales/sonidos');
+                renderizarSonidos(data); // Usa la nueva función de renderizado
+            } catch (error) {
+                sonidosOutputDiv.textContent = 'Error al obtener los sonidos.';
+                // Muestra el error específico devuelto por fetchApi o un mensaje genérico
+                mostrarMensaje(mensajeSonidosDiv, error.message || 'Error desconocido', 'error');
+            }
+        });
+    }
+
     // --- Lógica para Agregar Producto ---
     if (formAgregar) {
         formAgregar.addEventListener('submit', async (e) => {
