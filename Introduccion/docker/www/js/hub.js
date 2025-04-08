@@ -37,6 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const sonidosOutputDiv = document.getElementById('sonidos-output');
     const mensajeSonidosDiv = document.getElementById('mensaje-sonidos');
 
+    const formTablaPhp = document.getElementById('form-tabla-php');
+    const inputNumeroPhp = document.getElementById('php-numero');
+    const tablaPhpOutputDiv = document.getElementById('tabla-php-output');
+    const mensajeTablaPhpDiv = document.getElementById('mensaje-tabla-php');
+
     // --- Funciones Auxiliares ---
     function mostrarMensaje(divElement, texto, tipo = 'error') {
         if (divElement) {
@@ -53,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mensajeAgregarCocheDiv?.classList.remove('visible', 'success', 'error');
         mensajeEliminarCocheDiv?.classList.remove('visible', 'success', 'error');
         mensajeSonidosDiv?.classList.remove('visible', 'success', 'error');
+        mensajeTablaPhpDiv?.classList.remove('visible', 'success', 'error'); // Añadido 
     }
 
     async function fetchApi(endpoint, options = {}) {
@@ -157,6 +163,33 @@ function renderizarSonidos(data) {
     }
 }
 
+function renderizarTablaMultiplicar(data) {
+    if (!tablaPhpOutputDiv) return;
+
+    if (data && data.tabla && Array.isArray(data.tabla)) {
+        let html = `<h4>Tabla de Multiplicar para ${data.numero_base || 'N/A'}:</h4>`;
+        html += '<table class="table table-bordered table-striped" style="margin-top: 10px; text-align: right;">'; // Añadir clases de estilo si usas Bootstrap
+        html += '<tbody>';
+        data.tabla.forEach(fila => {
+            html += '<tr>';
+            fila.forEach(celda => {
+                const valorFormateado = typeof celda === 'number' ? celda.toLocaleString() : celda;
+                html += `<td>${valorFormateado}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        tablaPhpOutputDiv.innerHTML = html;
+
+        if (data.mensaje) {
+            mostrarMensaje(mensajeTablaPhpDiv, data.mensaje, 'success');
+        }
+    } else {
+        tablaPhpOutputDiv.innerHTML = '<p>No se pudieron generar los datos de la tabla.</p>';
+        const errorMsg = data && data.error ? data.error : 'Respuesta inesperada de la API PHP.';
+        mostrarMensaje(mensajeTablaPhpDiv, errorMsg, 'error');
+    }
+}
 
 
     // --- Lógica para Ver Inventario ---
@@ -308,16 +341,16 @@ function renderizarSonidos(data) {
         formEliminarCoche.addEventListener('submit', async (e) => {
             e.preventDefault();
             ocultarMensajes();
-
+            
             const id = parseInt(inputCocheIdEliminar.value, 10);
-
+            
             if (isNaN(id) || id <= 0) {
                 mostrarMensaje(mensajeEliminarCocheDiv, 'Introduce un ID de coche válido (número entero positivo).', 'error');
                 return;
             }
-
+            
             try {
-                 // Llama al nuevo endpoint DELETE /coches/<id>
+                // Llama al nuevo endpoint DELETE /coches/<id>
                 const data = await fetchApi(`/coches/${id}`, {
                     method: 'DELETE'
                 });
@@ -327,13 +360,66 @@ function renderizarSonidos(data) {
                 if (btnVerCoches) btnVerCoches.click();
             } catch (error) {
                  // Manejar el caso 404 (Not Found) específicamente si se desea
-                if (error.message && error.message.toLowerCase().includes('no encontrado')) {
+                 if (error.message && error.message.toLowerCase().includes('no encontrado')) {
                      mostrarMensaje(mensajeEliminarCocheDiv, `Error: ${error.message}`, 'error');
-                } else {
-                     mostrarMensaje(mensajeEliminarCocheDiv, error.message || 'Error al eliminar coche.', 'error');
+                    } else {
+                        mostrarMensaje(mensajeEliminarCocheDiv, error.message || 'Error al eliminar coche.', 'error');
                 }
             }
         });
     }
 
+    // --- Lógica para la Tabla de Multiplicar (1.php)
+    if (formTablaPhp) {
+        formTablaPhp.addEventListener('submit', async (e) => {
+            
+            e.preventDefault(); // Evitar envío default
+            ocultarMensajes();
+            tablaPhpOutputDiv.textContent = 'Generando tabla...';
+    
+            const numero = inputNumeroPhp.value;
+    
+            // Validación simple en cliente
+            if (numero === '') {
+                mostrarMensaje(mensajeTablaPhpDiv, 'Por favor, introduce un número.', 'error');
+                tablaPhpOutputDiv.textContent = ''; // Limpiar 'Generando...'
+                return;
+            }
+    
+            // El endpoint PHP espera JSON
+            const body = JSON.stringify({ numero: numero }); // Enviar como string, PHP lo manejará
+    
+            try {
+                // --- URL DEL ENDPOINT PHP ---
+                // Nota: No usamos apiUrlBase aquí porque es un endpoint PHP servido directamente por Nginx bajo la raíz web.
+                const endpointUrl = '/api_php/api_router.php?action=generar_tabla';
+
+                // Por ahora, fetch directo:
+                const response = await fetch(endpointUrl, {
+                    method: 'POST',
+                    headers: {
+                         'Content-Type': 'application/json',
+                         // 'Accept': 'application/json' // Opcional
+                    },
+                    body: body
+                });
+    
+                const responseData = await response.json(); // Intentar parsear JSON
+    
+                if (!response.ok) {
+                    throw new Error(responseData.error || `Error ${response.status}: ${response.statusText}`);
+                }
+    
+                renderizarTablaMultiplicar(responseData);
+                // formTablaPhp.reset(); // Opcional: limpiar input
+    
+            } catch (error) {
+                console.error('Error al llamar al endpoint PHP:', error);
+                tablaPhpOutputDiv.textContent = 'Error al generar la tabla.';
+                mostrarMensaje(mensajeTablaPhpDiv, error.message || 'Error desconocido al contactar la API PHP.', 'error');
+            }
+        });
+    }
+
+    
 }); // Fin DOMContentLoaded
