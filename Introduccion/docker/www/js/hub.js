@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tablaPhpOutputDiv = document.getElementById('tabla-php-output');
     const mensajeTablaPhpDiv = document.getElementById('mensaje-tabla-php');
 
+    const btnIniciarJuegoPhp = document.getElementById('btn-iniciar-juego-php'); // <-- El botón que faltaba
+    const formAdivinarPhp = document.getElementById('form-adivinar-php');
+    const inputAdivinaPhp = document.getElementById('input-adivinar-php');
+    const mensajeAdivinaPhpDiv = document.getElementById('mensaje-adivina-php');
+    const intentosPhpSpan = document.getElementById('intentos-php-span'); 
+
     // --- Funciones Auxiliares ---
     function mostrarMensaje(divElement, texto, tipo = 'error') {
         if (divElement) {
@@ -58,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mensajeAgregarCocheDiv?.classList.remove('visible', 'success', 'error');
         mensajeEliminarCocheDiv?.classList.remove('visible', 'success', 'error');
         mensajeSonidosDiv?.classList.remove('visible', 'success', 'error');
-        mensajeTablaPhpDiv?.classList.remove('visible', 'success', 'error'); // Añadido 
+        mensajeTablaPhpDiv?.classList.remove('visible', 'success', 'error'); 
+        mensajeAdivinaPhpDiv?.classList.remove('visible', 'success', 'error'); // Añadido 
     }
 
     async function fetchApi(endpoint, options = {}) {
@@ -91,15 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const precioProductoNum = parseFloat(p.precio);
                     const precioProductoFormateado = !isNaN(precioProductoNum) ? precioProductoNum.toFixed(2) : 'N/A';
                     html += `<li>${p.nombre} - Precio: ${precioProductoFormateado}€ - Cantidad: ${p.cantidad}</li>`;
-               });
+                });
                 html += '</ul>';
             }
             const valorTotalNumerico = parseFloat(data.valor_total);
 
             const valorTotalFormateado = !isNaN(valorTotalNumerico) ? valorTotalNumerico.toFixed(2) : '0.00';
-            
+
             html += `<p><strong>Valor Total del Inventario:</strong> <span id="inventario-valor">${valorTotalFormateado}€</span></p>`;
-            
+
             inventarioOutputDiv.innerHTML = html;
             // Mostrar mensaje de éxito si la API lo envió
             if (data.mensaje) {
@@ -135,61 +142,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-function renderizarSonidos(data) {
-    if (!sonidosOutputDiv) return;
+    function renderizarSonidos(data) {
+        if (!sonidosOutputDiv) return;
 
-    if (data && data.sonidos) {
-        let html = '<h4>Sonidos Generados:</h4>';
-        if (data.sonidos.length === 0) {
-            html += '<p>No se generaron sonidos.</p>';
+        if (data && data.sonidos) {
+            let html = '<h4>Sonidos Generados:</h4>';
+            if (data.sonidos.length === 0) {
+                html += '<p>No se generaron sonidos.</p>';
+            } else {
+                html += '<ul id="sonidos-lista">';
+                // data.sonidos es ahora una lista de objetos {tipo: ..., sonido: ...}
+                data.sonidos.forEach(s => {
+                    // Escapamos HTML simple por si acaso en tipo/sonido (aunque aquí no debería haber)
+                    const tipoEscapado = s.tipo.replace(/</g, "<").replace(/>/g, ">");
+                    const sonidoEscapado = s.sonido.replace(/</g, "<").replace(/>/g, ">");
+                    html += `<li><strong>${tipoEscapado}:</strong> ${sonidoEscapado}</li>`;
+                });
+                html += '</ul>';
+            }
+            sonidosOutputDiv.innerHTML = html;
+            if (data.mensaje) { // Mostrar mensaje de éxito si viene de la API
+                mostrarMensaje(mensajeSonidosDiv, data.mensaje, 'success');
+            }
         } else {
-            html += '<ul id="sonidos-lista">';
-            // data.sonidos es ahora una lista de objetos {tipo: ..., sonido: ...}
-            data.sonidos.forEach(s => {
-                // Escapamos HTML simple por si acaso en tipo/sonido (aunque aquí no debería haber)
-                const tipoEscapado = s.tipo.replace(/</g, "<").replace(/>/g, ">");
-                const sonidoEscapado = s.sonido.replace(/</g, "<").replace(/>/g, ">");
-                html += `<li><strong>${tipoEscapado}:</strong> ${sonidoEscapado}</li>`;
-            });
-            html += '</ul>';
+            sonidosOutputDiv.innerHTML = '<p>No se pudieron cargar los datos de los sonidos.</p>';
+            mostrarMensaje(mensajeSonidosDiv, 'Respuesta inesperada de la API.', 'error');
         }
-        sonidosOutputDiv.innerHTML = html;
-        if (data.mensaje) { // Mostrar mensaje de éxito si viene de la API
-            mostrarMensaje(mensajeSonidosDiv, data.mensaje, 'success');
-        }
-    } else {
-        sonidosOutputDiv.innerHTML = '<p>No se pudieron cargar los datos de los sonidos.</p>';
-        mostrarMensaje(mensajeSonidosDiv, 'Respuesta inesperada de la API.', 'error');
     }
-}
 
-function renderizarTablaMultiplicar(data) {
-    if (!tablaPhpOutputDiv) return;
+    function renderizarTablaMultiplicar(data) {
+        if (!tablaPhpOutputDiv) return;
 
-    if (data && data.tabla && Array.isArray(data.tabla)) {
-        let html = `<h4>Tabla de Multiplicar para ${data.numero_base || 'N/A'}:</h4>`;
-        html += '<table class="table table-bordered table-striped" style="margin-top: 10px; text-align: right;">'; // Añadir clases de estilo si usas Bootstrap
-        html += '<tbody>';
-        data.tabla.forEach(fila => {
-            html += '<tr>';
-            fila.forEach(celda => {
-                const valorFormateado = typeof celda === 'number' ? celda.toLocaleString() : celda;
-                html += `<td>${valorFormateado}</td>`;
+        if (data && data.tabla && Array.isArray(data.tabla)) {
+            let html = `<h4>Tabla de Multiplicar para ${data.numero_base || 'N/A'}:</h4>`;
+            html += '<table class="table table-bordered table-striped" style="margin-top: 10px; text-align: right;">'; // Añadir clases de estilo si usas Bootstrap
+            html += '<tbody>';
+            data.tabla.forEach(fila => {
+                html += '<tr>';
+                fila.forEach(celda => {
+                    const valorFormateado = typeof celda === 'number' ? celda.toLocaleString() : celda;
+                    html += `<td>${valorFormateado}</td>`;
+                });
+                html += '</tr>';
             });
-            html += '</tr>';
-        });
-        html += '</tbody></table>';
-        tablaPhpOutputDiv.innerHTML = html;
+            html += '</tbody></table>';
+            tablaPhpOutputDiv.innerHTML = html;
 
-        if (data.mensaje) {
-            mostrarMensaje(mensajeTablaPhpDiv, data.mensaje, 'success');
+            if (data.mensaje) {
+                mostrarMensaje(mensajeTablaPhpDiv, data.mensaje, 'success');
+            }
+        } else {
+            tablaPhpOutputDiv.innerHTML = '<p>No se pudieron generar los datos de la tabla.</p>';
+            const errorMsg = data && data.error ? data.error : 'Respuesta inesperada de la API PHP.';
+            mostrarMensaje(mensajeTablaPhpDiv, errorMsg, 'error');
         }
-    } else {
-        tablaPhpOutputDiv.innerHTML = '<p>No se pudieron generar los datos de la tabla.</p>';
-        const errorMsg = data && data.error ? data.error : 'Respuesta inesperada de la API PHP.';
-        mostrarMensaje(mensajeTablaPhpDiv, errorMsg, 'error');
     }
-}
 
 
     // --- Lógica para Ver Inventario ---
@@ -221,7 +228,7 @@ function renderizarTablaMultiplicar(data) {
             }
         });
     }
-    
+
     if (btnObtenerSonidos) {
         btnObtenerSonidos.addEventListener('click', async () => {
             ocultarMensajes();
@@ -341,14 +348,14 @@ function renderizarTablaMultiplicar(data) {
         formEliminarCoche.addEventListener('submit', async (e) => {
             e.preventDefault();
             ocultarMensajes();
-            
+
             const id = parseInt(inputCocheIdEliminar.value, 10);
-            
+
             if (isNaN(id) || id <= 0) {
                 mostrarMensaje(mensajeEliminarCocheDiv, 'Introduce un ID de coche válido (número entero positivo).', 'error');
                 return;
             }
-            
+
             try {
                 // Llama al nuevo endpoint DELETE /coches/<id>
                 const data = await fetchApi(`/coches/${id}`, {
@@ -359,11 +366,11 @@ function renderizarTablaMultiplicar(data) {
                 // Refrescar lista automáticamente
                 if (btnVerCoches) btnVerCoches.click();
             } catch (error) {
-                 // Manejar el caso 404 (Not Found) específicamente si se desea
-                 if (error.message && error.message.toLowerCase().includes('no encontrado')) {
-                     mostrarMensaje(mensajeEliminarCocheDiv, `Error: ${error.message}`, 'error');
-                    } else {
-                        mostrarMensaje(mensajeEliminarCocheDiv, error.message || 'Error al eliminar coche.', 'error');
+                // Manejar el caso 404 (Not Found) específicamente si se desea
+                if (error.message && error.message.toLowerCase().includes('no encontrado')) {
+                    mostrarMensaje(mensajeEliminarCocheDiv, `Error: ${error.message}`, 'error');
+                } else {
+                    mostrarMensaje(mensajeEliminarCocheDiv, error.message || 'Error al eliminar coche.', 'error');
                 }
             }
         });
@@ -372,23 +379,28 @@ function renderizarTablaMultiplicar(data) {
     // --- Lógica para la Tabla de Multiplicar (1.php)
     if (formTablaPhp) {
         formTablaPhp.addEventListener('submit', async (e) => {
-            
+
             e.preventDefault(); // Evitar envío default
             ocultarMensajes();
             tablaPhpOutputDiv.textContent = 'Generando tabla...';
-    
+
             const numero = inputNumeroPhp.value;
-    
+
             // Validación simple en cliente
             if (numero === '') {
                 mostrarMensaje(mensajeTablaPhpDiv, 'Por favor, introduce un número.', 'error');
                 tablaPhpOutputDiv.textContent = ''; // Limpiar 'Generando...'
                 return;
             }
-    
-            // El endpoint PHP espera JSON
-            const body = JSON.stringify({ numero: numero }); // Enviar como string, PHP lo manejará
-    
+
+            // DATOS PARA EL ROUTER PHP DEBIDO A REFACTORIZACION
+            const requestData = {
+                ejercicio: 'ej1',
+                accion: 'generar_tabla',
+                numero: numero // Enviar como string, PHP lo validará
+            };
+            // ------------------------------
+
             try {
                 // --- URL DEL ENDPOINT PHP ---
                 // Nota: No usamos apiUrlBase aquí porque es un endpoint PHP servido directamente por Nginx bajo la raíz web.
@@ -398,21 +410,21 @@ function renderizarTablaMultiplicar(data) {
                 const response = await fetch(endpointUrl, {
                     method: 'POST',
                     headers: {
-                         'Content-Type': 'application/json',
-                         // 'Accept': 'application/json' // Opcional
+                        'Content-Type': 'application/json',
+                        // 'Accept': 'application/json' // Opcional
                     },
-                    body: body
+                    body: JSON.stringify(requestData),
                 });
-    
+
                 const responseData = await response.json(); // Intentar parsear JSON
-    
+
                 if (!response.ok) {
                     throw new Error(responseData.error || `Error ${response.status}: ${response.statusText}`);
                 }
-    
+
                 renderizarTablaMultiplicar(responseData);
                 // formTablaPhp.reset(); // Opcional: limpiar input
-    
+
             } catch (error) {
                 console.error('Error al llamar al endpoint PHP:', error);
                 tablaPhpOutputDiv.textContent = 'Error al generar la tabla.';
@@ -421,5 +433,149 @@ function renderizarTablaMultiplicar(data) {
         });
     }
 
-    
-}); // Fin DOMContentLoaded
+    async function llamarRouterPhp(ejercicio, accion, datos = {}, method = 'POST') {
+        const routerUrl = '/api_php/api_router.php';
+        let url = routerUrl;
+        let body = null;
+        let headers = {};
+
+        const requestPayload = { ejercicio, accion, ...datos };
+
+        if (method === 'POST') {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify(requestPayload);
+        } else {
+            const params = new URLSearchParams(requestPayload);
+            url += `?${params.toString()}`;
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: headers,
+                body: body,
+                credentials: 'include'
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw {
+                    status: response.status,
+                    message: responseData.error || `Error HTTP ${response.status}`,
+                    data: responseData
+                };
+            }
+            return responseData;
+
+        } catch (error) {
+            console.error(`Error en llamarRouterPhp (${ejercicio}/${accion}):`, error);
+            if (error.message) {
+                throw error;
+            } else {
+                throw { message: 'Error de red o al contactar la API PHP.', data: null };
+            }
+        }
+    }
+
+    // Evento Iniciar/Reiniciar Partida
+    if (btnIniciarJuegoPhp) {
+        btnIniciarJuegoPhp.addEventListener('click', async () => {
+            ocultarMensajes();
+            mensajeAdivinaPhpDiv.textContent = 'Iniciando/Reiniciando partida...';
+            mensajeAdivinaPhpDiv.className = 'mensaje info visible';
+            try {
+                const estadoInicial = await llamarRouterPhp('ej2', 'iniciar', {}, 'POST');
+                actualizarInterfazAdivina(estadoInicial);
+            } catch (error) {
+                actualizarInterfazAdivina({
+                    error: error.message || 'No se pudo iniciar la partida (EJ2).',
+                    juego_terminado: true, intentos: 0
+                });
+            }
+        });
+    }
+
+    if (formAdivinarPhp) {
+        formAdivinarPhp.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            ocultarMensajes();
+            mensajeAdivinaPhpDiv.textContent = 'Procesando intento...';
+            mensajeAdivinaPhpDiv.className = 'mensaje info visible';
+            const numeroStr = inputAdivinaPhp.value;
+
+            if (numeroStr === '' || isNaN(parseInt(numeroStr)) || parseInt(numeroStr) < 0 || parseInt(numeroStr) > 100) {
+                const intentosActuales = parseInt(intentosPhpSpan.textContent.split(': ')[1] || '0');
+                actualizarInterfazAdivina({
+                    mensaje: 'Por favor, introduce un número válido entre 0 y 100.',
+                    juego_terminado: false, intentos: intentosActuales, error: true
+                });
+                return;
+            }
+
+            try {
+                const resultadoIntento = await llamarRouterPhp('ej2', 'adivinar', { numero: parseInt(numeroStr) }, 'POST');
+                actualizarInterfazAdivina(resultadoIntento);
+            } catch (error) {
+                const intentosActuales = parseInt(intentosPhpSpan.textContent.split(': ')[1] || '0');
+                actualizarInterfazAdivina({
+                    error: error.message || 'Error al procesar el intento (EJ2).',
+                    juego_terminado: error.data?.juego_terminado ?? false,
+                    intentos: error.data?.intentos ?? intentosActuales
+                });
+            }
+        });
+    }
+
+    function actualizarInterfazAdivina(estado) {
+        const debeMostrarFormulario = estado && !estado.error && estado.intentos !== undefined;
+
+        if (formAdivinarPhp) {
+            formAdivinarPhp.style.display = debeMostrarFormulario ? 'block' : 'none';
+        }
+         if (intentosPhpSpan) {
+             intentosPhpSpan.style.display = debeMostrarFormulario ? 'inline' : 'none'; 
+         }
+
+         ocultarMensajes(); 
+         if (estado.error) {
+            mostrarMensaje(mensajeAdivinaPhpDiv, estado.error, 'error');
+             if (formAdivinarPhp && estado.error.toLowerCase().includes("no se pudo iniciar")) {
+                 formAdivinarPhp.style.display = 'none';
+                 if(intentosPhpSpan) intentosPhpSpan.style.display = 'none';
+             }
+        } else if (estado.mensaje) {
+            const esExito = estado.mensaje.toLowerCase().includes('correcto') || estado.mensaje.toLowerCase().includes('felicidades');
+            const tipoMensaje = esExito ? 'success' : 'info';
+            mostrarMensaje(mensajeAdivinaPhpDiv, estado.mensaje, tipoMensaje);
+        } else if (mensajeAdivinaPhpDiv) {
+            mensajeAdivinaPhpDiv.className = 'mensaje'; // Quita visible, success, error, info
+            mensajeAdivinaPhpDiv.textContent = '';
+        }
+
+        const intentosNum = parseInt(estado.intentos);
+         if (intentosPhpSpan && !isNaN(intentosNum) && debeMostrarFormulario) {
+            intentosPhpSpan.textContent = `Intentos restantes: ${intentosNum}`;
+        } else if (intentosPhpSpan && debeMostrarFormulario) {
+            intentosPhpSpan.textContent = 'Intentos: -';
+        }
+
+        const juegoTerminado = estado.juego_terminado === true;
+        if (inputAdivinaPhp) {
+            inputAdivinaPhp.disabled = juegoTerminado;
+        }
+        if (formAdivinarPhp) {
+            const submitButton = formAdivinarPhp.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = juegoTerminado;
+            }
+        }
+
+        if (!juegoTerminado && inputAdivinaPhp) {
+            inputAdivinaPhp.value = '';
+             if (debeMostrarFormulario) {
+                 inputAdivinaPhp.focus();
+             }
+        }
+    }
+})

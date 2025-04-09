@@ -182,6 +182,29 @@
             </div>
              <div id="mensaje-tabla-php" class="mensaje"></div>
         </div>
+
+              
+        <!-- --- Ejercicio 2 (PHP): Adivina el Número --- -->
+        <div class="ejercicio-container">
+            <h2>Ejercicio 2 (PHP): Adivina el Número</h2>
+            <button id="btn-iniciar-juego-php" class="btn btn-primary">Iniciar/Reiniciar Juego PHP</button>
+        
+            <!-- Mensaje para el juego (puede mostrar estado, errores, etc.) -->
+            <div id="mensaje-adivina-php" class="mensaje"></div>
+        
+            <!-- Formulario para enviar el intento (inicialmente oculto) -->
+            <form id="form-adivinar-php" style="display: none; margin-top: 15px;">
+                <div class="form-group">
+                    <label for="input-adivinar-php">Introduce un número (0-100):</label>
+                    <input type="number" id="input-adivinar-php" class="form-control" min="0" max="100" required>
+                </div>
+                <!-- Contador de intentos (inicialmente oculto) -->
+                <p><span id="intentos-php-span" style="display: none;">Intentos restantes: -</span></p>
+                <button type="submit" class="btn btn-success">Adivinar</button>
+            </form>
+            <!-- Nota: Puedes usar una clase CSS 'hidden' o similar en lugar de style="display: none;" -->
+        
+        </div>
         <!-- futuros ejercicios aquí -->
 
     </main>
