@@ -244,32 +244,44 @@
 
         </div>
 
-        <!-- --- Ejercicio NLP: Procesamiento Interactivo (Revisado) --- -->
+
+        <!-- --- Ejercicio NLP: Procesamiento Interactivo (Multilingüe) --- -->
         <div class="ejercicio-container">
-            <h2>Ejercicio NLP: Procesamiento Interactivo</h2>
-            <p>Escribe texto para verlo procesado (tokenizado y etiquetado POS) automáticamente. Usa el botón para
-                alternar la visualización de etiquetas.</p>
+            <h2>Ejercicio NLP: Procesamiento Interactivo (Multilingüe)</h2>
+            <p>Escribe texto y selecciona el idioma. El texto se procesará (tokenizado y etiquetado POS)
+                automáticamente. Usa el botón para alternar la visualización de etiquetas.</p>
+
+            <!-- Selección de Idioma -->
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Idioma de Procesamiento:</label>
+                <!-- Usando botones simples para evitar dependencia Bootstrap -->
+                <div>
+                    <button class="btn btn-primary btn-sm nlp-lang-btn active" data-lang="es">Español (spaCy)</button>
+                    <button class="btn btn-outline-secondary btn-sm nlp-lang-btn" data-lang="en"
+                        style="margin-left: 5px;">Inglés (NLTK)</button>
+                    <input type="hidden" id="nlp-idioma-seleccionado" value="es">
+                    <!-- Input oculto para guardar selección -->
+                </div>
+            </div>
 
             <!-- Área de Entrada -->
             <div class="form-group">
                 <label for="nlp-texto-entrada">Texto de Entrada:</label>
                 <textarea id="nlp-texto-entrada" rows="6" class="form-control"
-                    placeholder="Escribe o pega tu texto aquí... El procesamiento se activa al dejar de escribir."></textarea>
+                    placeholder="Escribe o pega tu texto aquí..."></textarea>
             </div>
 
             <!-- Controles y Mensajes -->
-            <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div
+                style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <button id="nlp-toggle-mode" class="btn btn-secondary btn-sm">Ver Etiquetas</button>
-                <!-- Mensajes generales de NLP -->
                 <div id="mensaje-nlp" class="mensaje" style="flex-grow: 1; margin-left: 15px; text-align: right;"></div>
             </div>
 
-
             <!-- Área de Salida Unificada -->
             <div style="margin-top: 15px;">
-                <h4>Resultado Procesado:</h4>
+                <h4>Resultado Procesado (<span id="nlp-idioma-mostrado">Español</span>):</h4>
                 <div id="nlp-resultado" class="output-area" style="min-height: 100px; line-height: 1.9; padding: 10px;">
-                    <!-- El texto procesado (coloreado y/o etiquetado) aparecerá aquí -->
                     Esperando texto...
                 </div>
             </div>
@@ -278,12 +290,13 @@
             <div style="margin-top: 10px;">
                 <h5 style="font-size: 0.9em;">Leyenda de Colores (POS Tags):</h5>
                 <div id="nlp-leyenda-colores" style="font-size: 0.8em; line-height: 1.6;">
-                    <!-- La leyenda se generará con JS -->
                     Esperando procesamiento...
                 </div>
             </div>
         </div>
         <!-- --- Fin Ejercicio NLP --- -->
+
+
         <!-- futuros ejercicios aquí -->
 
     </main>

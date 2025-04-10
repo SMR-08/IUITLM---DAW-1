@@ -2,108 +2,97 @@
 # File: /API/Python/ejercicios_python/EJ_NLP/procesamiento_nlp.py
 
 import nltk
+import spacy
 import logging
-from typing import List, Tuple # Corrección: Tuple se importa de typing
+from typing import List, Tuple
 
-# Configurar un logger específico para este módulo si se desea
+# Configurar logger
 log_nlp = logging.getLogger(__name__)
-log_nlp.setLevel(logging.INFO) # O el nivel que prefieras
+log_nlp.setLevel(logging.INFO)
 
-# --- Verificación de Recursos NLTK (Opcional pero recomendado) ---
-# Intenta asegurar que los recursos se cargaron durante el build.
-# Si falla aquí, el contenedor no debería haber construido bien.
+# --- Carga de Modelos (Intentar al inicio) ---
+nlp_en_nltk_ready = False
+nlp_es_spacy_ready = False
+nlp_es = None
+
+# Verificar recursos NLTK para inglés
 try:
-    # nltk.data.find busca los recursos, si no los encuentra lanza LookupError
     nltk.data.find('tokenizers/punkt')
     nltk.data.find('taggers/averaged_perceptron_tagger')
-    log_nlp.info("Recursos NLTK 'punkt' y 'averaged_perceptron_tagger' encontrados.")
+    nltk.data.find('tokenizers/punkt_tab') # Añadido por si acaso
+    nltk.data.find('taggers/averaged_perceptron_tagger_eng') # Añadido por si acaso
+    log_nlp.info("Recursos NLTK para inglés encontrados.")
+    nlp_en_nltk_ready = True
 except LookupError as e:
-    log_nlp.critical(f"¡Error CRÍTICO! Recursos NLTK no encontrados: {e}. "
-                     "Asegúrate que 'RUN python -m nltk.downloader...' se ejecutó en el Dockerfile.")
-    # Podrías lanzar una excepción aquí para evitar que la app use estas funciones si fallan
-    # raise RuntimeError(f"Faltan recursos NLTK: {e}")
+    log_nlp.warning(f"Recursos NLTK para inglés no encontrados: {e}. El procesamiento NLTK podría fallar.")
 
-# --- Funciones de Procesamiento ---
+# Cargar modelo spaCy para español
+try:
+    nlp_es = spacy.load("es_core_news_sm")
+    log_nlp.info("Modelo spaCy español (es_core_news_sm) cargado.")
+    nlp_es_spacy_ready = True
+except OSError:
+    log_nlp.error("¡ERROR CRÍTICO! Modelo spaCy español (es_core_news_sm) no encontrado. "
+                  "Asegúrate de ejecutar 'python -m spacy download es_core_news_sm' en el Dockerfile.")
 
-def tokenizar_frases(texto_entrada: str) -> List[str]:
-    """
-    Divide un texto en una lista de frases utilizando NLTK.
+# --- Funciones de Procesamiento NLTK (Inglés) ---
 
-    Args:
-        texto_entrada: El texto a tokenizar.
+def etiquetar_palabras_nltk(texto_entrada: str) -> List[Tuple[str, str]]:
+    """Etiqueta palabras usando NLTK (Penn Treebank tags). Ideal para inglés."""
+    if not nlp_en_nltk_ready:
+        log_nlp.error("NLTK (inglés) no está listo. Faltan recursos.")
+        return [("Error:", "NLTK_RESOURCES_MISSING")]
 
-    Returns:
-        Una lista de strings, donde cada string es una frase detectada.
-        Devuelve una lista vacía si la entrada es vacía o nula.
-        Devuelve una lista con el texto original si ocurre un error inesperado.
-    """
     if not texto_entrada or not isinstance(texto_entrada, str):
-        log_nlp.warning("tokenizar_frases recibió entrada vacía o no válida.")
+        log_nlp.warning("etiquetar_palabras_nltk recibió entrada inválida.")
         return []
-
     try:
-        frases = nltk.tokenize.sent_tokenize(texto_entrada)
-        log_nlp.debug(f"Texto tokenizado en {len(frases)} frases.")
-        return frases
-    except Exception as e:
-        # Captura errores inesperados de NLTK (poco común con sent_tokenize)
-        log_nlp.error(f"Error inesperado durante sent_tokenize: {e}", exc_info=True)
-        # Devolver algo seguro, como una lista con el texto original
-        return [texto_entrada]
-
-
-def etiquetar_palabras(texto_entrada: str) -> List[Tuple[str, str]]:
-    """
-    Tokeniza un texto en palabras y asigna etiquetas gramaticales (POS tags) a cada palabra.
-
-    Args:
-        texto_entrada: El texto a etiquetar.
-
-    Returns:
-        Una lista de tuplas (palabra, etiqueta_POS).
-        Devuelve una lista vacía si la entrada es vacía o nula.
-        Devuelve una lista vacía si ocurre un error inesperado.
-    """
-    if not texto_entrada or not isinstance(texto_entrada, str):
-        log_nlp.warning("etiquetar_palabras recibió entrada vacía o no válida.")
-        return []
-
-    try:
-        # 1. Tokenizar en palabras
         palabras = nltk.tokenize.word_tokenize(texto_entrada)
-        log_nlp.debug(f"Texto tokenizado en {len(palabras)} palabras.")
-
-        if not palabras:
-            return [] # No hay palabras para etiquetar
-
-        # 2. Etiquetar las palabras
+        if not palabras: return []
         etiquetas_pos = nltk.pos_tag(palabras)
-        log_nlp.debug(f"Se generaron {len(etiquetas_pos)} etiquetas POS.")
-
+        log_nlp.debug(f"[NLTK] {len(etiquetas_pos)} etiquetas POS generadas.")
         return etiquetas_pos
-
     except Exception as e:
-        # Captura errores inesperados de NLTK (más probable con word_tokenize o pos_tag)
-        log_nlp.error(f"Error inesperado durante word_tokenize o pos_tag: {e}", exc_info=True)
-        # Devolver lista vacía en caso de error
+        log_nlp.error(f"Error inesperado durante NLTK pos_tag: {e}", exc_info=True)
+        return [("Error procesando con NLTK:", str(e))]
+
+# --- Función de Procesamiento spaCy (Español) ---
+
+def procesar_texto_spacy(texto_entrada: str) -> List[Tuple[str, str]]:
+    """Procesa texto usando spaCy (español) para obtener tokens y etiquetas POS universales."""
+    if not nlp_es_spacy_ready or not nlp_es:
+        log_nlp.error("spaCy (español) no está listo. Falta modelo.")
+        return [("Error:", "SPACY_MODEL_MISSING")]
+
+    if not texto_entrada or not isinstance(texto_entrada, str):
+        log_nlp.warning("procesar_texto_spacy recibió entrada inválida.")
         return []
+    try:
+        doc = nlp_es(texto_entrada)
+        resultado = [(token.text, token.pos_) for token in doc]
+        log_nlp.debug(f"[spaCy ES] {len(resultado)} tokens/etiquetas generadas.")
+        return resultado
+    except Exception as e:
+        log_nlp.error(f"Error inesperado durante procesamiento spaCy (ES): {e}", exc_info=True)
+        return [("Error procesando con spaCy:", str(e))]
 
-# --- Bloque de prueba (opcional, para ejecutar directamente) ---
+# --- Bloque de prueba (opcional) ---
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG) # Habilitar DEBUG para pruebas locales
-    texto_ejemplo = "Hola mundo. Esta es una frase de prueba. ¿NLTK funciona correctamente?"
+    logging.basicConfig(level=logging.DEBUG)
+    texto_ejemplo_es = "Hola mundo. Esta es una frase de prueba en español. ¿Funciona bien spaCy?"
+    texto_ejemplo_en = "Hello world. This is an English test sentence. Does NLTK work?"
 
-    print("--- Probando tokenizar_frases ---")
-    frases_resultado = tokenizar_frases(texto_ejemplo)
-    print(frases_resultado)
-    print("-" * 30)
+    print("\n--- Probando spaCy (Español) ---")
+    if nlp_es_spacy_ready:
+        etiquetas_es = procesar_texto_spacy(texto_ejemplo_es)
+        print(etiquetas_es)
+    else:
+        print("Modelo spaCy español no disponible para prueba.")
 
-    print("--- Probando etiquetar_palabras ---")
-    etiquetas_resultado = etiquetar_palabras(texto_ejemplo)
-    print(etiquetas_resultado)
-    print("-" * 30)
-
-    print("--- Probando con entrada vacía ---")
-    print("Frases:", tokenizar_frases(""))
-    print("Etiquetas:", etiquetar_palabras(""))
+    print("\n--- Probando NLTK (Inglés) ---")
+    if nlp_en_nltk_ready:
+        etiquetas_en = etiquetar_palabras_nltk(texto_ejemplo_en)
+        print(etiquetas_en)
+    else:
+        print("Recursos NLTK inglés no disponibles para prueba.")
     print("-" * 30)

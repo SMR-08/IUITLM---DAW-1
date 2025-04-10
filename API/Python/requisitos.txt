@@ -5,3 +5,4 @@ pymysql
 mysql-connector-python
 flask-cors
 nltk
+spacy
