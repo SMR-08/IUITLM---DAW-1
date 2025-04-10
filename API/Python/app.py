@@ -8,8 +8,22 @@ import logging
 import os
 import hashlib
 from decimal import Decimal, InvalidOperation
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Tuple
 from urllib.parse import unquote
+
+# --- AÑADIR IMPORTACIÓN EJ_NLP ---
+try:
+    from ejercicios_python.EJ_NLP.procesamiento_nlp import tokenizar_frases, etiquetar_palabras
+    logging.info("Módulos EJ_NLP (procesamiento_nlp) importados correctamente.")
+    EJ_NLP_DISPONIBLE = True
+except ImportError as e:
+    # log = logging.getLogger(__name__) # Ya debería estar definido
+    logging.error(f"Error importando módulos de EJ_NLP: {e}. La funcionalidad de NLP NO estará disponible.")
+    # Definir stubs si la importación falla, para que el resto no dé error
+    def tokenizar_frases(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
+    def etiquetar_palabras(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
+    EJ_NLP_DISPONIBLE = False
+# ---------------------------------
 
 # --- Importaciones de Lógica de Negocio ---
 # EJ03: Clases de animales
@@ -687,6 +701,155 @@ def api_registro_usuario():
     except Exception as e:
         log.exception(f"Error inesperado /apiregistro ({BANCO_DB_CONFIG['name']}): {e}")
         return jsonify({'error': 'Error interno'}), 500
+    
+# ==============================================================
+# --- Endpoints EJ_NLP: Procesamiento de Lenguaje Natural
+# ==============================================================
+
+# --- Endpoint Unificado NUEVO ---
+@app.route('/procesar_nlp', methods=['POST'])
+def api_procesar_nlp_completo():
+    """
+    Endpoint unificado para tokenizar y etiquetar (POS) un texto.
+    Llama directamente a etiquetar_palabras (que tokeniza internamente).
+    Espera un JSON con la clave 'texto'.
+    """
+    log.info("POST /procesar_nlp")
+
+    # Verificar disponibilidad del módulo NLP
+    if not EJ_NLP_DISPONIBLE:
+        log.error("Intento de acceso a /procesar_nlp pero EJ_NLP no está disponible.")
+        return jsonify({'error': 'Funcionalidad de NLP no disponible debido a un error interno.'}), 503
+
+    # Validar entrada JSON
+    try:
+        datos = request.get_json()
+        if not datos or 'texto' not in datos:
+            raise ValueError("Falta el campo 'texto' en el cuerpo JSON.")
+        texto_entrada = datos['texto']
+        if not isinstance(texto_entrada, str):
+             raise ValueError("El campo 'texto' debe ser una cadena de texto.")
+
+    except ValueError as verr:
+        log.warning(f"Datos inválidos en POST /procesar_nlp: {verr}")
+        return jsonify({'error': f'Datos inválidos: {str(verr)}'}), 400
+    except Exception as e_json:
+        log.error(f"Error procesando JSON en POST /procesar_nlp: {e_json}", exc_info=True)
+        return jsonify({'error': 'Error procesando los datos de entrada.'}), 400
+
+    # Procesar el texto usando la función de etiquetado (que ya tokeniza)
+    try:
+        # Llamar directamente a etiquetar_palabras
+        lista_resultado = etiquetar_palabras(texto_entrada)
+
+        # Devolver respuesta exitosa
+        log.info(f"Procesamiento NLP completado, {len(lista_resultado)} tokens/etiquetas generadas.")
+        # La 'lista_resultado' es la lista de tuplas [palabra, etiqueta]
+        return jsonify({
+            'resultado': lista_resultado, # Cambiamos la clave a 'resultado'
+            'mensaje': 'Texto procesado (tokenizado y etiquetado) correctamente.'
+        }), 200
+
+    except Exception as e_proc:
+        log.exception(f"Error inesperado durante el procesamiento en /procesar_nlp: {e_proc}")
+        return jsonify({'error': 'Error interno inesperado al procesar el texto.'}), 500
+    
+@app.route('/tokenizar', methods=['POST'])
+def api_tokenizar_frases():
+    """
+    Endpoint para tokenizar un texto de entrada en frases usando NLTK.
+    Espera un JSON con la clave 'texto'.
+    """
+    log.info("POST /tokenizar")
+
+    # Verificar disponibilidad del módulo NLP
+    if not EJ_NLP_DISPONIBLE:
+        log.error("Intento de acceso a /tokenizar pero EJ_NLP no está disponible.")
+        # 503 Service Unavailable es apropiado si falta una dependencia clave
+        return jsonify({'error': 'Funcionalidad de NLP no disponible debido a un error interno.'}), 503
+
+    # Validar entrada JSON
+    try:
+        datos = request.get_json()
+        if not datos or 'texto' not in datos:
+            raise ValueError("Falta el campo 'texto' en el cuerpo JSON.")
+        texto_entrada = datos['texto']
+        if not isinstance(texto_entrada, str):
+             raise ValueError("El campo 'texto' debe ser una cadena de texto.")
+
+    except ValueError as verr:
+        log.warning(f"Datos inválidos en POST /tokenizar: {verr}")
+        return jsonify({'error': f'Datos inválidos: {str(verr)}'}), 400
+    except Exception as e_json: # Capturar otros errores al procesar JSON
+        log.error(f"Error procesando JSON en POST /tokenizar: {e_json}", exc_info=True)
+        return jsonify({'error': 'Error procesando los datos de entrada.'}), 400
+
+    # Procesar el texto
+    try:
+        # Llamar a la función de lógica
+        lista_frases = tokenizar_frases(texto_entrada)
+
+        # Devolver respuesta exitosa
+        log.info(f"Tokenización completada, {len(lista_frases)} frases encontradas.")
+        return jsonify({
+            'frases': lista_frases,
+            'mensaje': 'Texto tokenizado en frases correctamente.'
+        }), 200
+
+    except Exception as e_proc:
+        # Capturar errores inesperados durante el procesamiento NLTK
+        log.exception(f"Error inesperado durante el procesamiento en /tokenizar: {e_proc}")
+        return jsonify({'error': 'Error interno inesperado al procesar el texto.'}), 500
+
+
+@app.route('/etiquetar', methods=['POST'])
+def api_etiquetar_palabras():
+    """
+    Endpoint para etiquetar gramaticalmente (POS tagging) las palabras de un texto.
+    Espera un JSON con la clave 'texto'.
+    """
+    log.info("POST /etiquetar")
+
+    # Verificar disponibilidad del módulo NLP
+    if not EJ_NLP_DISPONIBLE:
+        log.error("Intento de acceso a /etiquetar pero EJ_NLP no está disponible.")
+        return jsonify({'error': 'Funcionalidad de NLP no disponible debido a un error interno.'}), 503
+
+    # Validar entrada JSON (similar a /tokenizar)
+    try:
+        datos = request.get_json()
+        if not datos or 'texto' not in datos:
+            raise ValueError("Falta el campo 'texto' en el cuerpo JSON.")
+        texto_entrada = datos['texto']
+        if not isinstance(texto_entrada, str):
+             raise ValueError("El campo 'texto' debe ser una cadena de texto.")
+
+    except ValueError as verr:
+        log.warning(f"Datos inválidos en POST /etiquetar: {verr}")
+        return jsonify({'error': f'Datos inválidos: {str(verr)}'}), 400
+    except Exception as e_json:
+        log.error(f"Error procesando JSON en POST /etiquetar: {e_json}", exc_info=True)
+        return jsonify({'error': 'Error procesando los datos de entrada.'}), 400
+
+    # Procesar el texto
+    try:
+        # Llamar a la función de lógica
+        lista_etiquetas = etiquetar_palabras(texto_entrada)
+
+        # Devolver respuesta exitosa
+        log.info(f"Etiquetado POS completado, {len(lista_etiquetas)} etiquetas generadas.")
+        # La lista_etiquetas ya es una lista de tuplas [palabra, etiqueta]
+        return jsonify({
+            'etiquetas': lista_etiquetas,
+            'mensaje': 'Texto etiquetado gramaticalmente (POS) correctamente.'
+        }), 200
+
+    except Exception as e_proc:
+        # Capturar errores inesperados durante el procesamiento NLTK
+        log.exception(f"Error inesperado durante el procesamiento en /etiquetar: {e_proc}")
+        return jsonify({'error': 'Error interno inesperado al etiquetar el texto.'}), 500
+
+
 
 # --- Ejecución App (igual) ---
 if __name__ == '__main__':

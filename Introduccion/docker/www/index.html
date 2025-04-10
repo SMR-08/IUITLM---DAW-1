@@ -1,47 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Hub de Ejercicios API</title>
     <!-- Podrías enlazar a un CSS común o añadir estilos aquí -->
     <link rel="stylesheet" href="css/estilos.css"> <!-- Usando el mismo CSS del banco -->
     <style>
-        body { font-family: sans-serif; }
+        body {
+            font-family: sans-serif;
+        }
+
         .ejercicio-container {
             border: 1px solid #ccc;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
         }
-        .ejercicio-container h2 { margin-top: 0; }
-        #inventario-lista li { margin-bottom: 5px; }
-        #inventario-valor { font-weight: bold; }
+
+        .ejercicio-container h2 {
+            margin-top: 0;
+        }
+
+        #inventario-lista li {
+            margin-bottom: 5px;
+        }
+
+        #inventario-valor {
+            font-weight: bold;
+        }
+
         .output-area {
             margin-top: 15px;
             padding: 10px;
             background-color: #f0f0f0;
             border: 1px solid #ddd;
             min-height: 50px;
-            white-space: pre-wrap; /* Para mostrar saltos de línea y espacios */
+            white-space: pre-wrap;
+            /* Para mostrar saltos de línea y espacios */
             font-family: monospace;
         }
-        .mensaje { /* Estilos para mensajes de éxito/error */
-            padding: 10px; margin-top: 10px; border-radius: 4px; display: none;
+
+        .mensaje {
+            /* Estilos para mensajes de éxito/error */
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
         }
-        .mensaje.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .mensaje.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .visible { display: block !important; }
+
+        .mensaje.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .mensaje.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .visible {
+            display: block !important;
+        }
+
         /* Añadir algún estilo a los formularios */
-        .form-inline .form-group { margin-right: 10px; margin-bottom: 10px; }
+        .form-inline .form-group {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
+
 <body>
     <header>
-         <div class="header-content container">
-             <div class="logo">Hub de Ejercicios</div>
-             <!-- Podríamos añadir navegación si crece mucho -->
-         </div>
-     </header>
+        <div class="header-content container">
+            <div class="logo">Hub de Ejercicios</div>
+            <!-- Podríamos añadir navegación si crece mucho -->
+        </div>
+    </header>
 
     <main class="container">
         <h1>Prueba de Endpoints de Ejercicios</h1>
@@ -57,7 +95,7 @@
                 <!-- Aquí se mostrará el inventario -->
                 Pulsa "Ver Inventario" para cargar los datos...
             </div>
-             <div id="mensaje-inventario" class="mensaje"></div>
+            <div id="mensaje-inventario" class="mensaje"></div>
 
 
             <hr style="margin: 20px 0;">
@@ -78,7 +116,7 @@
                 </div>
                 <button type="submit" class="btn btn-success">Agregar</button>
             </form>
-             <div id="mensaje-agregar" class="mensaje"></div>
+            <div id="mensaje-agregar" class="mensaje"></div>
 
 
             <hr style="margin: 20px 0;">
@@ -91,24 +129,24 @@
                 </div>
                 <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
-             <div id="mensaje-eliminar" class="mensaje"></div>
+            <div id="mensaje-eliminar" class="mensaje"></div>
 
         </div>
 
         <div class="ejercicio-container">
             <h2>Ejercicio 2: Gestión de Coches</h2>
             <p>Gestiona una lista de coches almacenada en la base de datos.</p>
-        
+
             <button id="btn-ver-coches" class="btn btn-info">Ver Lista de Coches</button>
-        
+
             <div id="coches-output" class="output-area" style="margin-top:10px;">
                 <!-- Aquí se mostrará la lista de coches -->
                 Pulsa "Ver Lista de Coches" para cargar los datos...
             </div>
-             <div id="mensaje-coches" class="mensaje"></div>
-        
+            <div id="mensaje-coches" class="mensaje"></div>
+
             <hr style="margin: 20px 0;">
-        
+
             <h4>Agregar Coche</h4>
             <form id="form-agregar-coche" class="form-inline">
                 <div class="form-group">
@@ -125,10 +163,10 @@
                 </div>
                 <button type="submit" class="btn btn-success">Agregar Coche</button>
             </form>
-             <div id="mensaje-agregar-coche" class="mensaje"></div>
-        
+            <div id="mensaje-agregar-coche" class="mensaje"></div>
+
             <hr style="margin: 20px 0;">
-        
+
             <h4>Eliminar Coche por ID</h4>
             <form id="form-eliminar-coche" class="form-inline">
                 <div class="form-group">
@@ -137,10 +175,10 @@
                 </div>
                 <button type="submit" class="btn btn-danger">Eliminar Coche</button>
             </form>
-             <div id="mensaje-eliminar-coche" class="mensaje"></div>
-        
+            <div id="mensaje-eliminar-coche" class="mensaje"></div>
+
         </div>
-        
+
         <!-- --- Ejercicio 3: Animales --- -->
         <div class="ejercicio-container">
             <h2>Ejercicio 3: Sonidos de Animales</h2>
@@ -152,9 +190,9 @@
                 <!-- Aquí se mostrarán los sonidos -->
                 Pulsa "Obtener Sonidos" para ver el resultado...
             </div>
-             <div id="mensaje-sonidos" class="mensaje"></div>
+            <div id="mensaje-sonidos" class="mensaje"></div>
         </div>
-        
+
         <!-- --- Ejercicio 4: Banco --- -->
         <div class="ejercicio-container">
             <h2>Ejercicio 4: Aplicación Bancaria</h2>
@@ -163,7 +201,7 @@
             <a href="banco.php" class="btn btn-primary">Ir a la Aplicación del Banco</a>
         </div>
 
-          
+
         <!--Ejercicio 1 de php: tabla de multiplicar -->
         <div class="ejercicio-container">
             <h2>Ejercicio 1 (PHP): Tabla de Multiplicar</h2>
@@ -180,18 +218,18 @@
             <div id="tabla-php-output" class="output-area" style="margin-top:10px;">
                 Introduce un número y pulsa "Generar Tabla (PHP)"...
             </div>
-             <div id="mensaje-tabla-php" class="mensaje"></div>
+            <div id="mensaje-tabla-php" class="mensaje"></div>
         </div>
 
-              
+
         <!-- --- Ejercicio 2 (PHP): Adivina el Número --- -->
         <div class="ejercicio-container">
             <h2>Ejercicio 2 (PHP): Adivina el Número</h2>
             <button id="btn-iniciar-juego-php" class="btn btn-primary">Iniciar/Reiniciar Juego PHP</button>
-        
+
             <!-- Mensaje para el juego (puede mostrar estado, errores, etc.) -->
             <div id="mensaje-adivina-php" class="mensaje"></div>
-        
+
             <!-- Formulario para enviar el intento (inicialmente oculto) -->
             <form id="form-adivinar-php" style="display: none; margin-top: 15px;">
                 <div class="form-group">
@@ -203,13 +241,56 @@
                 <button type="submit" class="btn btn-success">Adivinar</button>
             </form>
             <!-- Nota: Puedes usar una clase CSS 'hidden' o similar en lugar de style="display: none;" -->
-        
+
         </div>
+
+        <!-- --- Ejercicio NLP: Procesamiento Interactivo (Revisado) --- -->
+        <div class="ejercicio-container">
+            <h2>Ejercicio NLP: Procesamiento Interactivo</h2>
+            <p>Escribe texto para verlo procesado (tokenizado y etiquetado POS) automáticamente. Usa el botón para
+                alternar la visualización de etiquetas.</p>
+
+            <!-- Área de Entrada -->
+            <div class="form-group">
+                <label for="nlp-texto-entrada">Texto de Entrada:</label>
+                <textarea id="nlp-texto-entrada" rows="6" class="form-control"
+                    placeholder="Escribe o pega tu texto aquí... El procesamiento se activa al dejar de escribir."></textarea>
+            </div>
+
+            <!-- Controles y Mensajes -->
+            <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <button id="nlp-toggle-mode" class="btn btn-secondary btn-sm">Ver Etiquetas</button>
+                <!-- Mensajes generales de NLP -->
+                <div id="mensaje-nlp" class="mensaje" style="flex-grow: 1; margin-left: 15px; text-align: right;"></div>
+            </div>
+
+
+            <!-- Área de Salida Unificada -->
+            <div style="margin-top: 15px;">
+                <h4>Resultado Procesado:</h4>
+                <div id="nlp-resultado" class="output-area" style="min-height: 100px; line-height: 1.9; padding: 10px;">
+                    <!-- El texto procesado (coloreado y/o etiquetado) aparecerá aquí -->
+                    Esperando texto...
+                </div>
+            </div>
+
+            <!-- Leyenda de Colores -->
+            <div style="margin-top: 10px;">
+                <h5 style="font-size: 0.9em;">Leyenda de Colores (POS Tags):</h5>
+                <div id="nlp-leyenda-colores" style="font-size: 0.8em; line-height: 1.6;">
+                    <!-- La leyenda se generará con JS -->
+                    Esperando procesamiento...
+                </div>
+            </div>
+        </div>
+        <!-- --- Fin Ejercicio NLP --- -->
         <!-- futuros ejercicios aquí -->
 
     </main>
 
     <!-- Incluir el JavaScript específico del Hub -->
     <script src="js/hub.js"></script>
+    <script src="js/nlp.js"></script>
 </body>
+
 </html>

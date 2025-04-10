@@ -17,6 +17,10 @@ COPY ./Python/requisitos.txt /app/requisitos.txt
 # '--no-cache-dir' ayuda a mantener la imagen más pequeña.
 RUN pip install --no-cache-dir -r requisitos.txt
 
+# Descargar los paquetes de datos necesarios de NLTK
+# Usamos python -m nltk.downloader para ejecutarlo como módulo
+RUN python -m nltk.downloader punkt averaged_perceptron_tagger punkt_tab averaged_perceptron_tagger_eng
+
 # NOTA: No se copia el código de la aplicación Python (.py) aquí,
 # ya que se monta como un volumen en docker-compose.yaml para desarrollo.
 

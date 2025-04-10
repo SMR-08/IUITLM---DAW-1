@@ -1,0 +1,243 @@
+# -----------------------------------------------------------------------------
+# Archivo .ignore para ProyScan
+# -----------------------------------------------------------------------------
+# Este archivo contiene patrones para excluir archivos y directorios del
+# escaneo realizado por ProyScan. El objetivo es centrarse en el código fuente
+# y los archivos de configuración relevantes, omitiendo artefactos de
+# compilación, dependencias externas, archivos de sistema, configuraciones
+# de IDE y archivos binarios o muy grandes.
+#
+# Siéntete libre de personalizarlo para las necesidades específicas de tu proyecto.
+# -----------------------------------------------------------------------------
+
+# Sistemas de Control de Versiones
+# ---------------------------------
+.git/
+.svn/
+.hg/
+.bzr/
+
+# Artefactos de Compilación y Construcción
+# ---------------------------------------
+# Lenguajes compilados (Java, C#, C++, Go, Rust, etc.)
+bin/
+obj/
+out/
+build/
+target/
+dist/
+*.o
+*.a
+*.so
+*.dll
+*.lib
+*.exe
+*.nupkg
+*.jar
+*.war
+*.ear
+*.class
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+wheels/
+*.whl
+htmlcov/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# JavaScript / Node.js
+# --------------------
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm/
+.yarn/
+.pnp.*
+
+# PHP / Composer
+# --------------
+vendor/
+composer.lock
+
+# Ruby / Bundler
+# --------------
+vendor/bundle/
+.bundle/
+log/
+tmp/
+.gem/
+
+# Go
+# --
+vendor/
+*.exe
+*.test
+
+# Rust
+# ----
+target/
+Cargo.lock # Aunque a veces útil, puede ser muy grande y no es código fuente
+
+# Logs y Archivos Temporales
+# --------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+*.swo # Vim swap files
+
+# Archivos de Sistema Operativo
+# -----------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+# Windows
+Thumbs.db
+ehthumbs_vista.db
+desktop.ini
+[Dd]esktop.ini
+# Linux
+*~
+
+# Configuraciones de IDEs y Editores
+# ----------------------------------
+# VS Code
+.vscode/
+# JetBrains (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Eclipse
+.project
+.classpath
+.settings/
+# NetBeans
+nbproject/
+# Otros
+.tags*
+tags
+# Vim
+.viminfo
+
+# Dependencias y Paquetes (Otros)
+# -------------------------------
+bower_components/
+jspm_packages/
+packages/ # .NET, Dart
+Pods/ # CocoaPods (iOS/macOS)
+
+# Archivos Comprimidos y Paquetes
+# -------------------------------
+*.zip
+*.rar
+*.tar
+*.gz
+*.bz2
+*.7z
+*.tgz
+*.pkg
+*.dmg
+*.iso
+
+# Archivos Binarios Comunes (Documentos, Imágenes, etc.)
+# ----------------------------------------------------
+# Aunque ProyScan intenta detectar binarios, excluirlos aquí evita procesarlos.
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.odt
+*.ods
+*.odp
+*.epub
+*.mobi
+# Imágenes
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.svg # Aunque basado en texto, a menudo son assets, no código fuente directo
+# Audio/Video
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.aac
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wmv
+# Fuentes
+*.woff
+*.woff2
+*.ttf
+*.otf
+*.eot
+# Bases de datos locales
+*.sqlite
+*.db
+*.db3
+*.mdb
+
+# Archivos de Entorno y Secretos
+# ------------------------------
+.env*
+*.env
+!.env.example # A menudo se quiere incluir el ejemplo
+.secret*
+*.secret
+*.pem
+*.key
+*.cer
+*.p12
+*.pfx
+
+# Archivos específicos de herramientas o frameworks (ejemplos)
+# ----------------------------------------------------------
+# Docker
+docker-compose.override.yml
+.dockerignore
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Archivos propios de ProyScan (redundante si el código los ignora, pero seguro)
+# --------------------------------------------------------------------------
+estructura_archivos.txt
+contenido_archivos.json
