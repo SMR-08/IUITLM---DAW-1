@@ -4,7 +4,9 @@
 import nltk
 import spacy
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
+from nltk.tokenize import sent_tokenize 
+from nltk.translate import gale_church
 
 # Configurar logger
 log_nlp = logging.getLogger(__name__)
@@ -76,6 +78,66 @@ def procesar_texto_spacy(texto_entrada: str) -> List[Tuple[str, str]]:
         log_nlp.error(f"Error inesperado durante procesamiento spaCy (ES): {e}", exc_info=True)
         return [("Error procesando con spaCy:", str(e))]
 
+def alinear_frases_gale_church(texto_es: str, texto_en: str) -> Dict[str, Any]:
+    """
+    Segmenta textos y los alinea usando el algoritmo Gale-Church.
+
+    Args:
+        texto_es: Texto en español.
+        texto_en: Texto en inglés.
+
+    Returns:
+        Un diccionario con:
+        - 'frases_es': Lista de frases en español.
+        - 'frases_en': Lista de frases en inglés.
+        - 'alineacion': Lista de tuplas (idx_es, idx_en) representando la alineación.
+                         Puede incluir None si una frase no se alinea.
+                         O puede ser una lista de listas si hay alineaciones M-N.
+                         (Gale-Church devuelve [(s1, s2), ...])
+         - 'error': Mensaje de error si lo hubo, sino None.
+    """
+    resultado = {
+        'frases_es': [],
+        'frases_en': [],
+        'alineacion': [],
+        'error': None
+    }
+    try:
+        # 1. Segmentar frases (¡Es crucial especificar el idioma!)
+        # Usar NLTK sent_tokenize para ambos por consistencia con Gale-Church
+        # aunque spaCy también puede segmentar.
+        if not nlp_en_nltk_ready: # Verificar si NLTK está listo
+             raise RuntimeError("Recursos NLTK (punkt) necesarios para sent_tokenize no disponibles.")
+
+        frases_es = sent_tokenize(texto_es, language='spanish')
+        frases_en = sent_tokenize(texto_en, language='english')
+        resultado['frases_es'] = frases_es
+        resultado['frases_en'] = frases_en
+
+        if not frases_es or not frases_en:
+            log_nlp.warning("Uno o ambos textos no produjeron frases para alinear.")
+            # Devolver frases vacías pero sin error explícito, alineación vacía.
+            return resultado
+
+        # 2. Calcular longitudes
+        longitudes_es = [len(f) for f in frases_es]
+        longitudes_en = [len(f) for f in frases_en]
+
+        # 3. Alinear usando Gale-Church
+        # align_blocks es más simple y devuelve la lista [(idx_es, idx_en), ...]
+        # Los índices se refieren a la posición en las listas frases_es/frases_en
+        # Nota: Puede devolver alineaciones 1-0, 0-1, 1-2, 2-1, 2-2 además de 1-1.
+        # Necesitamos manejar esto en el frontend.
+        # La función devuelve directamente la lista de tuplas.
+        resultado['alineacion'] = gale_church.align_blocks(longitudes_es, longitudes_en)
+        log_nlp.info(f"Alineación Gale-Church generada: {resultado['alineacion']}")
+
+    except Exception as e:
+        log_nlp.error(f"Error durante alineación Gale-Church: {e}", exc_info=True)
+        resultado['error'] = f"Error en alineación: {e}"
+        resultado['alineacion'] = [] # Asegurar que sea una lista vacía en error
+
+    return resultado
 # --- Bloque de prueba (opcional) ---
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

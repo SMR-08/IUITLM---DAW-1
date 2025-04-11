@@ -245,56 +245,98 @@
         </div>
 
 
-        <!-- --- Ejercicio NLP: Procesamiento Interactivo (Multilingüe) --- -->
-        <div class="ejercicio-container">
-            <h2>Ejercicio NLP: Procesamiento Interactivo (Multilingüe)</h2>
-            <p>Escribe texto y selecciona el idioma. El texto se procesará (tokenizado y etiquetado POS)
-                automáticamente. Usa el botón para alternar la visualización de etiquetas.</p>
 
-            <!-- Selección de Idioma -->
+        <!-- --- Ejercicio NLP: Procesamiento Simple y Paralelo --- -->
+        <div class="ejercicio-container">
+            <h2>Ejercicio NLP: Procesamiento Simple y Paralelo</h2>
+            <p>Selecciona un modo: procesa un solo texto automáticamente o introduce textos paralelos (ES/EN) y
+                procésalos manualmente.</p>
+
+            <!-- Selector de Modo -->
             <div class="form-group" style="margin-bottom: 15px;">
-                <label>Idioma de Procesamiento:</label>
-                <!-- Usando botones simples para evitar dependencia Bootstrap -->
+                <label style="font-weight: bold;">Modo de Procesamiento:</label>
                 <div>
-                    <button class="btn btn-primary btn-sm nlp-lang-btn active" data-lang="es">Español (spaCy)</button>
-                    <button class="btn btn-outline-secondary btn-sm nlp-lang-btn" data-lang="en"
-                        style="margin-left: 5px;">Inglés (NLTK)</button>
-                    <input type="hidden" id="nlp-idioma-seleccionado" value="es">
-                    <!-- Input oculto para guardar selección -->
+                    <button class="btn btn-info btn-sm nlp-mode-btn active" data-mode="simple">Simple (Auto)</button>
+                    <button class="btn btn-outline-info btn-sm nlp-mode-btn" data-mode="paralelo"
+                        style="margin-left: 5px;">Paralelo (ES/EN)</button>
+                    <input type="hidden" id="nlp-modo-actual" value="simple"> <!-- Guarda el modo activo -->
                 </div>
             </div>
 
-            <!-- Área de Entrada -->
-            <div class="form-group">
-                <label for="nlp-texto-entrada">Texto de Entrada:</label>
-                <textarea id="nlp-texto-entrada" rows="6" class="form-control"
-                    placeholder="Escribe o pega tu texto aquí..."></textarea>
+            <!-- === Área de Entrada === -->
+            <!-- Contenedor para Entrada Simple (Visible por defecto) -->
+            <div id="nlp-entrada-simple" class="nlp-input-area">
+                <div class="form-group">
+                    <label for="nlp-texto-entrada-simple">Texto de Entrada:</label>
+                    <select id="nlp-idioma-simple" class="form-control form-control-sm"
+                        style="display: inline-block; width: auto; margin-left: 10px; font-size: 0.8em; padding: 2px 5px; height: auto;">
+                        <option value="es" selected>Español (spaCy)</option>
+                        <option value="en">Inglés (NLTK)</option>
+                    </select>
+                    <textarea id="nlp-texto-entrada-simple" rows="6" class="form-control" style="margin-top: 5px;"
+                        placeholder="Escribe o pega tu texto aquí... El procesamiento se activa al dejar de escribir."></textarea>
+                </div>
             </div>
 
-            <!-- Controles y Mensajes -->
+            <!-- Contenedor para Entrada Paralela (Oculto por defecto) -->
+            <div id="nlp-entrada-paralelo" class="nlp-input-area" style="display: none;">
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="nlp-texto-es">Texto Español:</label>
+                        <textarea id="nlp-texto-es" rows="6" class="form-control"
+                            placeholder="Introduce el texto en español..."></textarea>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="nlp-texto-en">Texto Inglés:</label>
+                        <textarea id="nlp-texto-en" rows="6" class="form-control"
+                            placeholder="Introduce el texto en inglés..."></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <button id="btn-procesar-paralelo" class="btn btn-success">Procesar Textos Paralelos</button>
+                </div>
+            </div>
+            <!-- === Fin Área de Entrada === -->
+
+
+            <!-- Controles Comunes y Mensajes -->
             <div
-                style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <button id="nlp-toggle-mode" class="btn btn-secondary btn-sm">Ver Etiquetas</button>
+                style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-top: 1px solid #eee; padding-top: 10px;">
+                <button id="nlp-toggle-mode-vista" class="btn btn-secondary btn-sm">Ver Etiquetas</button>
+                <!-- Switch común -->
                 <div id="mensaje-nlp" class="mensaje" style="flex-grow: 1; margin-left: 15px; text-align: right;"></div>
             </div>
 
-            <!-- Área de Salida Unificada -->
+
+            <!-- === Área de Salida === -->
             <div style="margin-top: 15px;">
-                <h4>Resultado Procesado (<span id="nlp-idioma-mostrado">Español</span>):</h4>
-                <div id="nlp-resultado" class="output-area" style="min-height: 100px; line-height: 1.9; padding: 10px;">
-                    Esperando texto...
+                <h4 id="nlp-titulo-resultado">Resultado Procesado (<span id="nlp-idioma-mostrado">N/A</span>):</h4>
+
+                <!-- Contenedor para Salida Simple (Visible por defecto) -->
+                <div id="nlp-resultado-simple" class="nlp-output-area output-area"
+                    style="min-height: 100px; line-height: 1.9; padding: 10px;">
+                    Selecciona el modo "Simple" e introduce texto arriba...
+                </div>
+
+                <!-- Contenedor para Salida Paralela (Oculto por defecto) -->
+                <div id="nlp-resultado-paralelo" class="nlp-output-area" style="display: none; padding: 10px;">
+                    <!-- Quitado flex, añadido padding -->
+                    <!-- Los pares de frases alineadas se insertarán aquí -->
+                    Selecciona el modo "Paralelo" y procesa los textos...
                 </div>
             </div>
+            <!-- === Fin Área de Salida === -->
 
-            <!-- Leyenda de Colores -->
-            <div style="margin-top: 10px;">
+            <!-- Leyenda Común -->
+            <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
                 <h5 style="font-size: 0.9em;">Leyenda de Colores (POS Tags):</h5>
                 <div id="nlp-leyenda-colores" style="font-size: 0.8em; line-height: 1.6;">
-                    Esperando procesamiento...
+                    La leyenda aparecerá aquí después de procesar texto...
                 </div>
             </div>
         </div>
         <!-- --- Fin Ejercicio NLP --- -->
+
 
 
         <!-- futuros ejercicios aquí -->

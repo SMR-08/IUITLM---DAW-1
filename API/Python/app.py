@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 # --- AÑADIR IMPORTACIÓN EJ_NLP ---
 try:
     # Importar ambas funciones ahora
-    from ejercicios_python.EJ_NLP.procesamiento_nlp import etiquetar_palabras_nltk, procesar_texto_spacy
+    from ejercicios_python.EJ_NLP.procesamiento_nlp import etiquetar_palabras_nltk, procesar_texto_spacy, alinear_frases_gale_church
     log.info("Módulos EJ_NLP (procesamiento_nlp) importados correctamente.")
     EJ_NLP_DISPONIBLE = True
 except ImportError as e:
@@ -31,6 +31,7 @@ except ImportError as e:
     log.error(f"Error importando módulos de EJ_NLP: {e}. La funcionalidad de NLP NO estará disponible.")
     def etiquetar_palabras_nltk(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
     def procesar_texto_spacy(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
+    def alinear_frases_gale_church(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
     EJ_NLP_DISPONIBLE = False
 # ---------------------------------
 
@@ -776,8 +777,82 @@ def api_procesar_nlp_completo():
         log.exception(f"Error inesperado durante el procesamiento en /procesar_nlp ({idioma}): {e_proc}")
         return jsonify({'error': 'Error interno inesperado al procesar el texto.'}), 500
 
+# --- Endpoint para Textos Paralelos (NUEVO) ---
+@app.route('/procesar_paralelo', methods=['POST'])
+def api_procesar_paralelo():
+    """
+    Endpoint para procesar dos textos paralelos (español e inglés).
+    Espera JSON con 'texto_es' y 'texto_en'.
+    Usa spaCy para español y NLTK para inglés.
+    """
+    log.info("POST /procesar_paralelo")
 
-# --- Ejecución App (igual) ---
+    if not EJ_NLP_DISPONIBLE:
+        log.error("Intento de acceso a /procesar_paralelo pero EJ_NLP no está disponible.")
+        return jsonify({'error': 'Funcionalidad de NLP no disponible (error de importación).'}), 503
+
+    # Validar entrada JSON para ambos textos
+    try:
+        datos = request.get_json()
+        # ... (validar texto_es, texto_en) ...
+        texto_es = datos['texto_es']
+        texto_en = datos['texto_en']
+    except Exception as e_val:
+         return jsonify({'error': f'Datos inválidos: {str(e_val)}'}), 400
+
+    # 1. Alinear frases primero
+    resultado_alineacion = alinear_frases_gale_church(texto_es, texto_en)
+
+    if resultado_alineacion['error']:
+         log.error(f"Fallo en alineación Gale-Church: {resultado_alineacion['error']}")
+         return jsonify({'error': resultado_alineacion['error']}), 500
+    # 2. Etiquetar cada frase obtenida de la alineación
+    errores_tagging = {"es": None, "en": None}
+    datos_es_procesados = []
+    datos_en_procesados = []
+
+    # Etiquetar frases en español
+    for i, frase in enumerate(resultado_alineacion['frases_es']):
+        try:
+            tags = procesar_texto_spacy(frase)
+            if tags and tags[0][0] == "Error:":
+                 raise RuntimeError(f"Error interno spaCy: {tags[0][1]}")
+            datos_es_procesados.append({"id": i, "frase": frase, "tags": tags})
+        except Exception as e_tag_es:
+            log.error(f"Error etiquetando frase ES {i}: {e_tag_es}")
+            errores_tagging["es"] = errores_tagging.get("es", "") + f"Frase {i}: {e_tag_es}; "
+            datos_es_procesados.append({"id": i, "frase": frase, "tags": [], "error": str(e_tag_es)}) # Añadir error a datos
+
+    # Etiquetar frases en inglés
+    for i, frase in enumerate(resultado_alineacion['frases_en']):
+         try:
+             tags = etiquetar_palabras_nltk(frase)
+             if tags and tags[0][0] == "Error:":
+                 raise RuntimeError(f"Error interno NLTK: {tags[0][1]}")
+             datos_en_procesados.append({"id": i, "frase": frase, "tags": tags})
+         except Exception as e_tag_en:
+             log.error(f"Error etiquetando frase EN {i}: {e_tag_en}")
+             errores_tagging["en"] = errores_tagging.get("en", "") + f"Frase {i}: {e_tag_en}; "
+             datos_en_procesados.append({"id": i, "frase": frase, "tags": [], "error": str(e_tag_en)})
+
+    # Preparar respuesta final
+    status_code = 200
+    mensaje_final = "Textos paralelos procesados y alineados."
+    errores_finales = {k: v for k, v in errores_tagging.items() if v is not None}
+    if errores_finales:
+        mensaje_final = "Textos procesados con errores en el etiquetado."
+        # Podríamos mantener 200 si la alineación fue bien y algún etiquetado falló
+
+    return jsonify({
+        'alineacion': resultado_alineacion['alineacion'], # Lista de tuplas [(idx_es, idx_en)]
+        'datos_es': datos_es_procesados, # Lista de {id, frase, tags, ?error}
+        'datos_en': datos_en_procesados, # Lista de {id, frase, tags, ?error}
+        'mensaje': mensaje_final,
+        'errores': errores_finales if errores_finales else None
+    }), status_code
+
+
+# --- Ejecución App ---
 if __name__ == '__main__':
     # --- CORREGIDO: Comprobación crítica de variables de entorno ANTES de correr ---
     # Asegurarse de que TODAS las configuraciones necesarias tienen valores mínimos.
