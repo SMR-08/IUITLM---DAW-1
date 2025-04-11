@@ -1,7 +1,7 @@
 # Dockerfile para la API de Python
 
-# Usa una imagen base de Python 3.9 slim-buster (ligera).
-FROM python:3.9-slim-buster
+# Usa una imagen base de Python 3.9 (Para usar el tagger no podemos usar una ligera, la dependencia blis da problemas serios).
+FROM python:3.10
 
 # Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
@@ -13,6 +13,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 # --------------------------
 
+RUN pip install --upgrade pip 
 # Copia el archivo de requisitos al contenedor.
 # Es necesario copiarlo para poder instalar las dependencias en el siguiente paso.
 # Asegúrate que la ruta relativa './Python/requisitos.txt' es correcta

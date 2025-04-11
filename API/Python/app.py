@@ -11,6 +11,15 @@ from decimal import Decimal, InvalidOperation
 from typing import List, Dict, Any, Union, Tuple
 from urllib.parse import unquote
 
+# --- Configuración del log ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+)
+# Definir el logger principal AHORA
+log = logging.getLogger(__name__)
+# ----------------------------------------------------
+
 # --- AÑADIR IMPORTACIÓN EJ_NLP ---
 try:
     # Importar ambas funciones ahora
@@ -18,7 +27,7 @@ try:
     log.info("Módulos EJ_NLP (procesamiento_nlp) importados correctamente.")
     EJ_NLP_DISPONIBLE = True
 except ImportError as e:
-    log = logging.getLogger(__name__) # Asegurar que log existe
+    log = log.getLogger(__name__) # Asegurar que log existe
     log.error(f"Error importando módulos de EJ_NLP: {e}. La funcionalidad de NLP NO estará disponible.")
     def etiquetar_palabras_nltk(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
     def procesar_texto_spacy(*args, **kwargs): raise ImportError("Módulo NLP no cargado")
@@ -30,10 +39,10 @@ except ImportError as e:
 try:
     # Asumiendo que EJ3.py está en la ruta correcta
     from ejercicios_python.EJ03.EJ3 import Animal, Perro, Gato
-    logging.info("Módulos EJ3 (Animal, Perro, Gato) importados correctamente.") # Log va aquí
+    log.info("Módulos EJ3 (Animal, Perro, Gato) importados correctamente.") # Log va aquí
     EJ3_AVAILABLE = True
 except ImportError as e:
-    log = logging.getLogger(__name__) # Asegúrate que log existe si la importación falla pronto
+    log = log.getLogger(__name__) # Asegúrate que log existe si la importación falla pronto
     log.error(f"Error importando módulos de EJ3: {e}. La funcionalidad de animales NO estará disponible.")
     class Animal: pass
     class Perro(Animal): pass
@@ -43,9 +52,9 @@ except ImportError as e:
 # EJ04: Clases del Banco
 try:
     from ejercicios_python.EJ04.EJ4 import Cuenta, CuentaJoven
-    logging.info("Módulos EJ04 (Cuenta, CuentaJoven) importados correctamente.")
+    log.info("Módulos EJ04 (Cuenta, CuentaJoven) importados correctamente.")
 except ImportError as e:
-    logging.error(f"Error CRÍTICO importando módulos de EJ04: {e}. La funcionalidad del banco NO estará disponible.")
+    log.error(f"Error CRÍTICO importando módulos de EJ04: {e}. La funcionalidad del banco NO estará disponible.")
     # Definir stubs si fuera estrictamente necesario para que el linter no falle,
     # aunque es mejor que falle si no se pueden importar.
     class Cuenta: pass
@@ -60,9 +69,9 @@ try:
         eliminar_elemento,
         ErrorBaseDatos # Importar la excepción real
     )
-    logging.info("Módulo db.py importado correctamente.")
+    log.info("Módulo db.py importado correctamente.")
 except ImportError:
-    logging.error("Error CRÍTICO importando 'db.py'. Las operaciones de base de datos fallarán.")
+    log.error("Error CRÍTICO importando 'db.py'. Las operaciones de base de datos fallarán.")
     # Define stubs para que el resto del código no falle en el análisis estático
     class ErrorBaseDatos(Exception): pass
     def obtener_todos_los_elementos(*args: Any, **kwargs: Any) -> List[Dict[str, Any]]: raise ImportError("Módulo DB no cargado")
@@ -76,12 +85,6 @@ except ImportError:
 app = Flask(__name__)
 CORS(app)
 
-# --- Configuración del Logging ---
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
-)
-log = logging.getLogger(__name__)
 
 # --- Nombres de Bases de Datos desde Variables de Entorno ---
 # Usamos valores por defecto por si no están definidas, aunque deberían estarlo por docker-compose
@@ -101,7 +104,7 @@ COCHES_DB_CONFIG = {
 }
 
 # Validar que las configuraciones esenciales están presentes
-# Validación y Logging de Configuración (Sin cambios visuales, pero la comprobación crítica está al final)
+# Validación y log de Configuración (Sin cambios visuales, pero la comprobación crítica está al final)
 log.info(f"Configuración BD Banco: Host={BANCO_DB_CONFIG.get('host')}, DB={BANCO_DB_CONFIG.get('name')}, User={BANCO_DB_CONFIG.get('user')}")
 log.info(f"Configuración BD Inventario: Host={INVENTARIO_DB_CONFIG.get('host')}, DB={INVENTARIO_DB_CONFIG.get('name')}, User={INVENTARIO_DB_CONFIG.get('user')}")
 log.info(f"Configuración BD Coches: Host={COCHES_DB_CONFIG.get('host')}, DB={COCHES_DB_CONFIG.get('name')}, User={COCHES_DB_CONFIG.get('user')}")
