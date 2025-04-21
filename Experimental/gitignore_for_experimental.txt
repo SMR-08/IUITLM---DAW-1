@@ -1,0 +1,4 @@
+# Ignore directories and files within the Experimental project
+backend/__pycache__/
+frontend/node_modules/
+frontend/build/
