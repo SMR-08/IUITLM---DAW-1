@@ -4,11 +4,13 @@
   --text-color: #212529;
   --header-bg-color: #ffffff;
   --footer-bg-color: #ffffff;
-  --accent-color: #61dafb; /* React blue */
+  --accent-color: #6366f1; /* Indigo */
   --card-bg: #ffffff;
   --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --gradient-start: rgba(97, 218, 251, 0.8);
-  --gradient-end: rgba(97, 218, 251, 0.2);
+  --gradient-start: rgba(99, 102, 241, 0.8);
+  --gradient-end: rgba(99, 102, 241, 0.2);
+  --border-radius: 0.5rem;
+  --transition: all 0.3s ease;
 }
 
 .dark-mode {
@@ -16,11 +18,11 @@
   --text-color: #e9ecef;
   --header-bg-color: #1e1e1e;
   --footer-bg-color: #1e1e1e;
-  --accent-color: #4aa3df;
+  --accent-color: #818cf8;
   --card-bg: #2d2d2d;
   --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  --gradient-start: rgba(74, 163, 223, 0.8);
-  --gradient-end: rgba(74, 163, 223, 0.2);
+  --gradient-start: rgba(129, 140, 248, 0.8);
+  --gradient-end: rgba(129, 140, 248, 0.2);
 }
 
 /* Añadir esta regla para aplicar el fondo oscuro directamente al body */
@@ -61,6 +63,11 @@ body {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
 .App-main {
@@ -167,6 +174,11 @@ body {
   flex-grow: 1;
 }
 
+.app-icon {
+  color: var(--card-color, var(--accent-color));
+  margin-bottom: 1rem;
+}
+
 .app-link {
   display: flex;
   align-items: center;
@@ -199,26 +211,67 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Nuevo botón de tema estilo NLTK */
 .theme-toggle {
-  background: none;
+  position: relative;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #e5e7eb;
   border: none;
-  color: var(--text-color);
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
+  padding: 0 5px;
+  transition: var(--transition);
 }
 
-.theme-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.dark-mode .theme-toggle {
+  background-color: #4b5563;
 }
 
-.dark-mode .theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.toggle-ball {
+  position: absolute;
+  left: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+.dark-mode .toggle-ball {
+  left: 33px;
+}
+
+.sun-icon,
+.moon-icon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition: var(--transition);
+}
+
+.sun-icon {
+  right: 8px;
+  background: radial-gradient(circle, #f59e0b 30%, transparent 30%);
+  box-shadow: 0 0 0 2px #f59e0b;
+  border-radius: 50%;
+}
+
+.moon-icon {
+  left: 8px;
+  background: radial-gradient(circle at 70% 30%, #e5e7eb 30%, #4b5563 30%);
+  border-radius: 50%;
+}
+
+.dark-mode .sun-icon {
+  opacity: 0.5;
+}
+
+.dark-mode .moon-icon {
+  opacity: 1;
 }
 
 /* Responsive adjustments */

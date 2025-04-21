@@ -1,4 +1,4 @@
-# docker-compose.yaml
+# docker-compose.yaml (Raíz del Proyecto - Integrado)
 version: '3.8'
 #╔═══════════════════════════════════════╗
 #║  Iniciar y Construir Contenedores:    ║
@@ -9,100 +9,102 @@ version: '3.8'
 #╚═══════════════════════════════════════╝
 # Define los servicios (contenedores) que componen la aplicación.
 services:
-  # Servicio para el servidor web Nginx.
+  # --- Servicios Originales ---
   nginx:
     container_name: nginx
-    # Configuración para construir la imagen de Nginx a partir de un Dockerfile.
     build:
-      context: ./Introduccion/docker  # El directorio docker es el contexto de construcción.
-      dockerfile: nginx.dockerfile  # Usa el archivo renombrado 'nginx.dockerfile'.
+      context: ./Introduccion/docker
+      dockerfile: nginx.dockerfile
     ports:
-      - "80:80"  # Mapea el puerto 80 del host al puerto 80 del contenedor Nginx.
+      - "80:80"
     networks:
-      - red_www  # Conecta el contenedor Nginx a la red 'red_www'.
+      - red_www
     depends_on:
-      - php-fpm  # Asegura que el contenedor 'php-fpm' se inicie antes que Nginx.
-      - angular  # Asegura que el contenedor 'angular' se inicie antes que Nginx.
-      - python-api # Asegura que el contenedor 'python-api' se inicie antes que Nginx.
+      - php-fpm
+      - angular
+      - python-api
+      - experimental-backend # Añadido por si nginx necesita hacer proxy a él
+      - experimental-frontend # Añadido por si nginx necesita hacer proxy a él
     volumes:
-      # Monta el código fuente web. No se necesita COPY en el Dockerfile de nginx para esto.
       - ./Introduccion/docker/www:/var/www/html
-      # Monta las configuraciones específicas de Nginx para las aplicaciones.
-      # Asegúrate que estos archivos existen en tu host en las rutas especificadas.
-      - ./Introduccion/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf # Montamos la configuración default si es necesaria.
-      - ./Introduccion/docker/nginx/angular.conf:/etc/nginx/conf.d/angular.conf # Monta el fichero 'angular.conf'.
-      - ./Introduccion/docker/nginx/api.conf:/etc/nginx/conf.d/api.conf # Monta la configuración para el proxy inverso de la API.
+      - ./Introduccion/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./Introduccion/docker/nginx/angular.conf:/etc/nginx/conf.d/angular.conf
+      - ./Introduccion/docker/nginx/api.conf:/etc/nginx/conf.d/api.conf
+      # Monta el código de la API PHP para que Nginx pueda servirlo si es necesario (o pasar a php-fpm)
       - ./API/PHP:/var/www/html/api_php
+      # Monta también los archivos estáticos del frontend experimental si Nginx los va a servir directamente
+      # (Alternativa al proxy_pass, depende de cómo configures nginx/experimental.conf)
+      # - ./Experimental/frontend/build:/usr/share/nginx/html/experimental # Ejemplo si sirves build estático
 
-  # Servicio para PHP-FPM (FastCGI Process Manager).
   php-fpm:
     container_name: php-fpm
     build:
       context: ./Introduccion/docker
-      dockerfile: php.dockerfile # Usa el archivo renombrado 'php.dockerfile'.
+      dockerfile: php.dockerfile
     networks:
-      - red_www  # Conecta el contenedor PHP-FPM a la red 'red_www'.
+      - red_www
     volumes:
       # Monta el código fuente web, compartido con Nginx.
       - ./Introduccion/docker/www:/var/www/html:cached
-      - ./API/PHP:/var/www/html/api_php
-    working_dir: /var/www/html # Establece /var/www/html como directorio "de trabajo".
+      # Monta el código de la API PHP para que php-fpm pueda ejecutarlo
+      - ./API/PHP:/var/www/html/api_php:cached
+    working_dir: /var/www/html
 
-  # Servicio para la base de datos MariaDB.
   mariadb:
     container_name: mariadb
     image: mariadb:latest
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${DB_BANCO_NAME}
+      MARIADB_DATABASE: ${DB_BANCO_NAME} # Crea BD Banco por defecto
       MARIADB_USER: ${DB_BANCO_USER}
       MARIADB_PASSWORD: ${DB_BANCO_PASSWORD}
+      # Nota: Las otras BDs (InventarioDB, CochesDB) se crean mediante el script SQL.
     networks:
       - red_www
     volumes:
       - mariadb_data:/var/lib/mysql
+      # Monta el script SQL para inicializar todas las bases de datos y usuarios necesarios.
       - ./BBDD/Banco:/docker-entrypoint-initdb.d
 
-  # Servicio para phpMyAdmin (interfaz web para administrar MariaDB).
   phpmyadmin:
     container_name: phpmyadmin
-    image: phpmyadmin:latest  # Usa la última imagen oficial de phpMyAdmin.
+    image: phpmyadmin:latest
     ports:
-      - "8080:80"  # Mapea el puerto 8080 del host al puerto 80 del contenedor phpMyAdmin.
+      - "8080:80"
     environment:
-      # Variables de entorno para configurar phpMyAdmin.
-      PMA_HOST: mariadb  # Nombre del servicio (MariaDB) al que se conectará.
-      PMA_PORT: 3306  # Puerto de MariaDB.
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      # Puedes añadir PMA_USER y PMA_PASSWORD si quieres preconfigurar un login,
+      # pero es más seguro loguearse manualmente.
     networks:
-      - red_www  # Conecta el contenedor phpMyAdmin a la red 'red_www'.
+      - red_www
     depends_on:
-      - mariadb  # Asegura que MariaDB se inicie antes que phpMyAdmin.
+      - mariadb
 
-  # Servicio para la aplicación Angular.
   angular:
     container_name: angular
     build:
-      # El contexto es el directorio que contiene el Dockerfile y el código fuente de Angular.
       context: ./Introduccion/angular/app-test
-      dockerfile: angular.dockerfile # Usa el archivo renombrado 'angular.dockerfile'.
+      dockerfile: angular.dockerfile # Este Dockerfile construye y sirve con Nginx interno
     networks:
       - red_www
-    # No necesita volumes aquí porque la build de Angular se copia dentro de la imagen
-    # y Nginx accede a ella a través de la configuración montada en el servicio nginx.
+    # Nota: Este servicio Angular ya incluye Nginx. El Nginx principal (arriba)
+    # hace proxy_pass a este servicio en angular.localhost. No necesita exponer puertos al host directamente.
 
-  # Servicio para la API de Python.
   python-api:
     container_name: python-api
     build:
       context: ./API
       dockerfile: api.dockerfile
     ports:
+      # Expone el puerto del HOST definido en .env (default 5000) al puerto INTERNO 8000
       - "${API_PORT_HOST:-5000}:${API_PORT_CONTAINER:-8000}"
     networks:
       - red_www
     depends_on:
       - mariadb
     environment:
+      # Pasa todas las variables de entorno necesarias para la API Python
       - DB_HOST=${DB_HOST}
       - DB_BANCO_NAME=${DB_BANCO_NAME}
       - DB_BANCO_USER=${DB_BANCO_USER}
@@ -113,10 +115,56 @@ services:
       - DB_COCHES_NAME=${DB_COCHES_NAME}
       - DB_COCHES_USER=${DB_COCHES_USER}
       - DB_COCHES_PASSWORD=${DB_COCHES_PASSWORD}
+      - API_PORT_CONTAINER=${API_PORT_CONTAINER:-8000} # Puerto interno donde escucha Gunicorn/Flask
+      - FLASK_DEBUG=${FLASK_DEBUG:-false} # Para activar modo debug si se desea
     volumes:
-      - ./API/Python:/app
+      # Monta el código de la API Python para desarrollo (hot-reloading)
+      - ./API/Python:/app:cached
 
+  # --- Servicios Experimentales Integrados ---
+
+  experimental-backend:
+    container_name: experimental-backend
+    build:
+      context: ./Experimental/backend # Ruta relativa a la raíz del proyecto
+      dockerfile: Dockerfile # Dockerfile dentro del contexto
+    ports:
+      # Expone el puerto 8001 del HOST al 8000 del CONTENEDOR para evitar conflicto con python-api
+      - "8001:8000"
+    networks:
+      - red_www
+    volumes:
+      # Monta el código del backend experimental para desarrollo
+      - ./Experimental/backend:/app:cached
+    # El comando 'uvicorn main:app --host 0.0.0.0 --reload' se toma del Dockerfile de Experimental/backend
+
+  experimental-frontend:
+    container_name: experimental-frontend
+    build:
+      context: ./Experimental/frontend # Ruta relativa a la raíz del proyecto
+      dockerfile: Dockerfile # Dockerfile dentro del contexto
+    ports:
+      # Expone el puerto 3000 del HOST al 3000 del CONTENEDOR (React Dev Server)
+      - "3000:3000"
+    networks:
+      - red_www
+    volumes:
+      # Monta el código del frontend experimental para desarrollo (hot-reloading)
+      # Evita montar node_modules para usar los instalados en la imagen
+      - ./Experimental/frontend:/app:cached
+      - /app/node_modules # Truco para usar node_modules de la imagen y no del host
+    depends_on:
+      - experimental-backend # Depende del backend experimental
+    environment:
+      - WATCHPACK_POLLING=true # Necesario para hot-reloading en algunos entornos Docker
+    # Asumiendo que el comando `npm start` está en el Dockerfile de Experimental/frontend
+    # Si no, añádelo aquí:
+    # command: npm start
+
+# --- Volúmenes Persistentes ---
 volumes:
-  mariadb_data:
+  mariadb_data: # Volumen para persistir los datos de MariaDB
+
+# --- Redes ---
 networks:
-  red_www: 
+  red_www: # Red común para que los contenedores se comuniquen por nombre de servicio
