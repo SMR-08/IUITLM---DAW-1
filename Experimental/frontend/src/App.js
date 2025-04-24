@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 import "./App.css"
 import { ExternalLink, Brain } from "lucide-react"
 import NLTKPage from "./pages/nltk-page"
+import DbChatComponent from "./components/DbChatComponent"; // Import the new component
 import { ThemeProvider, useTheme } from "./context/theme-context"
 
 // Componente Layout para la página principal
@@ -10,20 +11,19 @@ function MainLayout({ children }) {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <div className={`App ${theme === "dark" ? "dark-mode" : ""}`}>
-      <header className="App-header">
-        <div className="logo-container">
-          <h1></h1>
-        </div>
-        <div className="header-right">
-          <button className="theme-toggle" onClick={toggleTheme} aria-label="Cambiar tema">
-            <div className="toggle-ball"></div>
-            <div className="sun-icon"></div>
-            <div className="moon-icon"></div>
-          </button>
-        </div>
-      </header>
-
+    <div className="App">
+    <header className="App-header">
+          <div className="logo-container">
+            <h1></h1>
+          </div>
+       <div className="header-right">
+         <button className="theme-toggle" onClick={toggleTheme} aria-label="Cambiar tema">
+              <div className="toggle-ball"></div>
+              <div className="sun-icon"></div>
+              <div className="moon-icon"></div>
+         </button>
+       </div>
+    </header>
       <main className="App-main">{children}</main>
 
       <footer className="App-footer">
@@ -45,6 +45,14 @@ function HomePage() {
       color: "#6366f1",
       icon: <Brain size={24} />,
     },
+    { // Add the new DB Chat app card
+       id: 2,
+       name: "DB Chat AI",
+       description: "Diseña tu base de datos con IA",
+       url: "/db-chat",
+       color: "#007bff", // Example color
+       icon: <Brain size={24} />, // Use a relevant icon
+    }
   ]
 
   return (
@@ -86,6 +94,7 @@ function AppWithProviders() {
       <Router>
         <Routes>
           <Route path="/nltk" element={<NLTKPage />} />
+          <Route path="/db-chat" element={<DbChatComponent />} /> {/* Add the new route */}
           <Route
             path="/"
             element={

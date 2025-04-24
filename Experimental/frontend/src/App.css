@@ -1,39 +1,80 @@
-/* App.css */
+/* App.css - Refactored with CSS Variables */
 :root {
+  /* Core Palette */
   --bg-color: #f8f9fa;
   --text-color: #212529;
+  --text-color-muted: rgba(33, 37, 41, 0.8); /* For subtitles, descriptions */
+  --accent-color: #6366f1; /* Indigo */
+  --accent-color-light: #818cf8; /* Lighter Indigo for dark theme accent */
+  --color-on-accent: #ffffff; /* Text/icon color on accent background */
+
+  /* Component Backgrounds */
   --header-bg-color: #ffffff;
   --footer-bg-color: #ffffff;
-  --accent-color: #6366f1; /* Indigo */
   --card-bg: #ffffff;
+
+  /* Borders & Shadows */
+  --border-color-subtle: rgba(0, 0, 0, 0.1);
   --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.15);
+  --header-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  /* Gradients (Based on Accent) */
   --gradient-start: rgba(99, 102, 241, 0.8);
   --gradient-end: rgba(99, 102, 241, 0.2);
+
+  /* Theme Toggle */
+  --toggle-bg: #e5e7eb;
+  --toggle-ball-bg: #ffffff;
+  --toggle-ball-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --sun-color: #f59e0b;
+  --moon-base-color: #4b5563; /* Darker part of moon */
+  --moon-crater-color: #e5e7eb; /* Lighter part of moon */
+
+  /* Misc */
   --border-radius: 0.5rem;
+  --border-radius-large: 12px; /* For cards */
+  --border-radius-round: 50%;
   --transition: all 0.3s ease;
 }
 
-.dark-mode {
-  --bg-color: #121212;
+.dark-theme {
+  /* Core Palette */
+  --bg-color: #111827f2; /* Slightly transparent dark blue/gray */
   --text-color: #e9ecef;
-  --header-bg-color: #1e1e1e;
-  --footer-bg-color: #1e1e1e;
-  --accent-color: #818cf8;
+  --text-color-muted: rgba(233, 236, 239, 0.8);
+  --accent-color: #818cf8; /* Use the lighter Indigo for dark theme */
+  /* --color-on-accent remains white, usually looks good on lighter accent */
+
+  /* Component Backgrounds */
+  --header-bg-color: #111827;
+  --footer-bg-color: #1e1e1e; /* Slightly different dark for footer */
   --card-bg: #2d2d2d;
+
+  /* Borders & Shadows */
+  --border-color-subtle: rgba(255, 255, 255, 0.1);
   --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.4); /* Darker hover shadow */
+  --header-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+  /* Gradients (Based on Accent) */
   --gradient-start: rgba(129, 140, 248, 0.8);
   --gradient-end: rgba(129, 140, 248, 0.2);
+
+  /* Theme Toggle */
+  --toggle-bg: #4b5563; /* Dark Gray */
+  /* --toggle-ball-bg remains white for contrast */
+  /* --toggle-ball-shadow can remain the same or slightly adjusted if needed */
+  /* --sun-color remains orange */
+  /* --moon-base-color remains dark gray */
+  /* --moon-crater-color remains light gray */
 }
 
-/* Añadir esta regla para aplicar el fondo oscuro directamente al body */
-.dark-mode-body {
-  background-color: #121212;
-  color: #e9ecef;
-}
+/* Removed redundant dark theme overrides here as variables handle it */
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: var(--bg-color); /* Apply background to body */
+  color: var(--text-color); /* Apply text color to body */
   transition: background-color 0.3s, color 0.3s;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   margin: 0;
@@ -54,7 +95,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--header-shadow);
   position: relative;
   z-index: 10;
 }
@@ -125,8 +166,7 @@ body {
 
 .hero-subtitle {
   font-size: 1.2rem;
-  color: var(--text-color);
-  opacity: 0.8;
+  color: var(--text-color-muted); /* Use muted text color */
   max-width: 600px;
   margin: 0 auto;
 }
@@ -140,7 +180,7 @@ body {
 
 .app-card {
   background-color: var(--card-bg);
-  border-radius: 12px;
+  border-radius: var(--border-radius-large);
   box-shadow: var(--card-shadow);
   padding: 1.5rem;
   transition: transform 0.3s, box-shadow 0.3s;
@@ -149,12 +189,13 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  /* Card specific color override, uses accent as fallback */
   border-top: 4px solid var(--card-color, var(--accent-color));
 }
 
 .app-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .app-card h3 {
@@ -166,8 +207,7 @@ body {
 
 .app-card p {
   margin-bottom: 1rem;
-  color: var(--text-color);
-  opacity: 0.8;
+  color: var(--text-color-muted); /* Use muted text color */
 }
 
 .app-card-content {
@@ -175,6 +215,7 @@ body {
 }
 
 .app-icon {
+  /* Card specific color override, uses accent as fallback */
   color: var(--card-color, var(--accent-color));
   margin-bottom: 1rem;
 }
@@ -185,9 +226,10 @@ body {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--border-radius-round);
+  /* Card specific color override, uses accent as fallback */
   background-color: var(--card-color, var(--accent-color));
-  color: white;
+  color: var(--color-on-accent); /* Use variable for text on accent */
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
   margin-left: auto;
@@ -197,27 +239,22 @@ body {
   transform: scale(1.1);
 }
 
-/* Modificar el footer para que sea más consistente con el tema */
 .App-footer {
   background-color: var(--footer-bg-color);
   color: var(--text-color);
   padding: 1.5rem;
   text-align: center;
   margin-top: auto;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--border-color-subtle); /* Use variable border color */
 }
 
-.dark-mode .App-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Nuevo botón de tema estilo NLTK */
+/* Theme Toggle Button (Shared styles, potentially move to a common file later) */
 .theme-toggle {
   position: relative;
   width: 60px;
   height: 30px;
-  border-radius: 15px;
-  background-color: #e5e7eb;
+  border-radius: 15px; /* Consider --border-radius-round or specific value */
+  background-color: var(--toggle-bg);
   border: none;
   cursor: pointer;
   display: flex;
@@ -226,23 +263,21 @@ body {
   transition: var(--transition);
 }
 
-.dark-mode .theme-toggle {
-  background-color: #4b5563;
-}
+/* No need for .dark-mode .theme-toggle, handled by variable */
 
 .toggle-ball {
   position: absolute;
-  left: 5px;
+  left: 5px; /* Initial position for light mode */
   width: 22px;
   height: 22px;
-  border-radius: 50%;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-round);
+  background-color: var(--toggle-ball-bg);
+  box-shadow: var(--toggle-ball-shadow);
   transition: var(--transition);
 }
 
-.dark-mode .toggle-ball {
-  left: 33px;
+.dark-theme .toggle-ball {
+  left: 33px; /* Position for dark mode */
 }
 
 .sun-icon,
@@ -250,29 +285,33 @@ body {
   position: absolute;
   width: 16px;
   height: 16px;
-  transition: var(--transition);
+  transition: opacity var(--transition); /* Only transition opacity */
+  opacity: 1; /* Default visible */
 }
 
 .sun-icon {
   right: 8px;
-  background: radial-gradient(circle, #f59e0b 30%, transparent 30%);
-  box-shadow: 0 0 0 2px #f59e0b;
-  border-radius: 50%;
+  background: radial-gradient(circle, var(--sun-color) 30%, transparent 30%);
+  box-shadow: 0 0 0 2px var(--sun-color);
+  border-radius: var(--border-radius-round);
 }
 
 .moon-icon {
   left: 8px;
-  background: radial-gradient(circle at 70% 30%, #e5e7eb 30%, #4b5563 30%);
-  border-radius: 50%;
+  /* Moon uses base and crater colors */
+  background: radial-gradient(circle at 70% 30%, var(--moon-crater-color) 30%, var(--moon-base-color) 30%);
+  border-radius: var(--border-radius-round);
+  opacity: 0.5; /* Initially less visible in light mode */
 }
 
-.dark-mode .sun-icon {
-  opacity: 0.5;
+.dark-theme .sun-icon {
+  opacity: 0.5; /* Less visible in dark mode */
 }
 
-.dark-mode .moon-icon {
-  opacity: 1;
+.dark-theme .moon-icon {
+  opacity: 1; /* Fully visible in dark mode */
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -315,4 +354,4 @@ body {
   .apps-grid {
     grid-template-columns: 1fr;
   }
-}
+} 

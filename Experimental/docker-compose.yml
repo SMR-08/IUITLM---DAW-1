@@ -7,6 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    environment: # Add environment section
+      - GEMINI_API_KEY=${GEMINI_API_KEY} # Pass API key from host .env
     command: uvicorn main:app --host 0.0.0.0 --reload
 
   frontend:
@@ -15,8 +17,10 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
+      - /app/node_modules # Avoid host node_modules hiding container node_modules
     depends_on:
       - backend
     environment:
       - WATCHPACK_POLLING=true
+      - REACT_APP_BACKEND_URL=http://backend:8000 # Backend URL within Docker network
     # command will be added later when creating the React app

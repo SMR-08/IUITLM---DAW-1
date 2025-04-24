@@ -1,35 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react" // Keep useEffect if needed for other purposes, otherwise remove
 import { Brain, Home } from "lucide-react"
 import { Link } from "react-router-dom"
 import NLTKProcessor from "../components/nltk-processor"
 import "../styles/nltk-page.css"
+import { useTheme } from "../context/theme-context" // Import useTheme hook
 
 export default function NLTKPage() {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
-      return (
-        localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-      )
-    }
-    return "light"
-  })
+  // Use the global theme context
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark-theme")
-      document.body.classList.add("dark-mode-body")
-    } else {
-      document.documentElement.classList.remove("dark-theme")
-      document.body.classList.remove("dark-mode-body")
-    }
-    localStorage.setItem("theme", theme)
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
+  // Remove the local useState, useEffect, and toggleTheme function
 
   return (
     <div className="nltk-page">
@@ -44,6 +26,7 @@ export default function NLTKPage() {
               <Home size={18} />
               <span>Inicio</span>
             </Link>
+            {/* Use the global toggleTheme function */}
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Cambiar tema">
               <div className="toggle-ball"></div>
               <div className="sun-icon"></div>
