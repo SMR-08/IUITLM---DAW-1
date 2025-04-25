@@ -22,5 +22,5 @@ services:
       - backend
     environment:
       - WATCHPACK_POLLING=true
-      - REACT_APP_BACKEND_URL=http://backend:8000 # Backend URL within Docker network
+      - REACT_APP_BACKEND_URL=http://localhost:8000 # Apunta a localhost:8000 que es accesible desde el navegador
     # command will be added later when creating the React app

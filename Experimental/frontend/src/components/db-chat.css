@@ -155,3 +155,54 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* Styles for diagram header and toggle button */
+.diagram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.view-toggle-btn {
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.view-toggle-btn:hover:not(:disabled) {
+    background-color: #007bff;
+    color: white;
+}
+
+.view-toggle-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Styles for the Mermaid code view */
+.mermaid-code-view {
+    background-color: #f0f0f0; /* O un color oscuro para tema oscuro */
+    padding: 10px;
+    border-radius: 4px;
+    overflow: auto; /* Para barras de scroll si el código es largo */
+    white-space: pre; /* Asegura que se respeten los espacios y saltos */
+    font-family: monospace;
+    font-size: 0.9em;
+    width: 100%; /* Ocupar el ancho disponible */
+    box-sizing: border-box; /* Incluir padding en el ancho */
+    text-align: left; /* Alinear texto a la izquierda */
+    margin: 0; /* Quitar margen por defecto del pre */
+    color: #333; /* Color de texto para tema claro */
+}
+/* Añade estilos para tema oscuro si es necesario */
+.dark-theme .mermaid-code-view {
+     background-color: #2d2d2d;
+     color: #e0e0e0;
+}
