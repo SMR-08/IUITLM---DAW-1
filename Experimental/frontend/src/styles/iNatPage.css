@@ -1,0 +1,561 @@
+/* frontend/src/styles/iNatPage.css */
+
+/* Asumiendo que las variables :root y .dark-theme están en un CSS global (App.css o similar) */
+/* Asegúrate de tener estas variables definidas allí: */
+/*
+:root {
+  --success-color: #4CAF50; // Verde para >90%
+  --warning-color: #FF9800; // Naranja base
+  --danger-color: #B71C1C; // Rojo oscuro base
+  // ... otras variables de tema que ya tienes
+}
+.dark-theme {
+  --success-color: #66BB6A;
+  --warning-color: #FFA726;
+  --danger-color: #D32F2F;
+  // ...
+}
+*/
+
+
+.inat-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.inat-header {
+  background-color: var(--header-bg);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.header-content-inat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.logo-section-inat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.leaf-icon {
+  color: var(--secondary-color, #28a745); /* Usar secondary-color si existe, sino un verde default */
+}
+
+.logo-section-inat h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.main-nav-inat {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-link-inat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.nav-link-inat:hover {
+  color: var(--primary-color);
+  background-color: var(--primary-hover-bg);
+}
+
+.theme-toggle-inat {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: var(--toggle-bg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  transition: var(--transition);
+}
+
+.toggle-ball-inat {
+  position: absolute;
+  left: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--border-radius-round);
+  background-color: var(--toggle-ball-bg);
+  box-shadow: var(--toggle-ball-shadow);
+  transition: var(--transition);
+}
+
+.dark-theme .toggle-ball-inat, .dark-theme-page-specific .toggle-ball-inat {
+  left: 33px;
+}
+
+.sun-icon-inat,
+.moon-icon-inat {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition: opacity var(--transition);
+  opacity: 1;
+}
+
+.sun-icon-inat {
+  right: 8px;
+  background: radial-gradient(circle, var(--sun-color) 30%, transparent 30%);
+  box-shadow: 0 0 0 2px var(--sun-color);
+  border-radius: var(--border-radius-round);
+}
+
+.moon-icon-inat {
+  left: 8px;
+  background: radial-gradient(circle at 70% 30%, var(--moon-crater-color) 30%, var(--moon-base-color) 30%);
+  border-radius: var(--border-radius-round);
+  opacity: 0.5;
+}
+
+.dark-theme .sun-icon-inat, .dark-theme-page-specific .sun-icon-inat {
+  opacity: 0.5;
+}
+
+.dark-theme .moon-icon-inat, .dark-theme-page-specific .moon-icon-inat {
+  opacity: 1;
+}
+
+.inat-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1000px; /* Ajustado para acomodar imagen y resultados */
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.inat-hero-section {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.inat-hero-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.inat-hero-description {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.inat-classifier-section {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--card-border);
+  width: 100%;
+}
+
+.inat-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem; /* Espacio antes del área de resultados/imagen */
+}
+
+.inat-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed var(--primary-light);
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  text-align: center;
+}
+
+.inat-file-label:hover {
+  border-color: var(--primary-color);
+  background-color: var(--primary-hover-bg);
+}
+
+.inat-file-label input[type="file"] {
+  display: none;
+}
+
+.inat-file-label span {
+  margin-top: 0.75rem;
+  font-weight: 500;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Nuevo: Contenedor para imagen y resultados */
+.inat-content-with-results {
+    display: flex;
+    gap: 2rem; /* Espacio entre la imagen y los resultados */
+    margin-top: 1.5rem; /* Espacio después del área de subida/botones */
+    align-items: flex-start; /* Alinear elementos al inicio si tienen alturas diferentes */
+}
+
+.inat-image-display-area {
+    flex: 0 0 40%; /* La imagen ocupa el 40% del espacio, no crece ni se encoge */
+    max-width: 350px; /* Un máximo para que no sea demasiado grande */
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.inat-displayed-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.inat-results-section {
+    flex: 1; /* Los resultados ocupan el espacio restante */
+    /* margin-top: 0; Ya no necesita margen superior si está al lado de la imagen */
+}
+
+
+.inat-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem; /* Este margen es entre el input file y los botones */
+}
+
+.inat-submit-button, .inat-reset-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.inat-submit-button {
+  background-color: var(--primary-color);
+  color: var(--color-on-primary);
+}
+
+.inat-submit-button:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.inat-submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.inat-reset-button {
+    background-color: var(--text-light);
+    color: var(--background-color);
+    padding: 0.65rem;
+}
+.dark-theme .inat-reset-button, .dark-theme-page-specific .inat-reset-button {
+    background-color: var(--card-border);
+    color: var(--text-color);
+}
+
+.inat-reset-button:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--color-on-primary);
+  width: 18px;
+  height: 18px;
+  animation: spin 1s ease-in-out infinite;
+}
+.dark-theme .spinner, .dark-theme-page-specific .spinner {
+    border-top-color: var(--text-color); /* Asegurar contraste del spinner en modo oscuro */
+}
+
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.inat-error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  margin-top: 1.5rem;
+}
+.dark-theme .inat-error-message, .dark-theme-page-specific .inat-error-message {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171; /* Un rojo más claro para el texto en modo oscuro */
+}
+
+.inat-results-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.inat-predictions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inat-prediction-item {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; Lo quitamos para que el botón de búsqueda no se vaya al extremo */
+  padding: 0.75rem 0;
+  gap: 0.75rem; /* Reducido un poco el gap general */
+}
+
+.inat-prediction-label {
+  flex: 1 1 45%; /* Permite crecer y encoger, base del 45% */
+  min-width: 100px; /* Evitar que se encoja demasiado */
+  font-weight: 500;
+  color: var(--text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 0.5rem; /* Espacio antes de la barra */
+}
+
+.inat-prediction-bar-container {
+    flex: 1 1 35%; /* Base del 35% */
+    min-width: 80px;
+    background-color: var(--primary-hover-bg);
+    border-radius: var(--border-radius-round);
+    height: 14px; /* Un poco más alta */
+    overflow: hidden;
+}
+
+.inat-prediction-bar {
+    height: 100%;
+    /* background-color se establece inline */
+    border-radius: var(--border-radius-round);
+    transition: width 0.5s ease-out, background-color 0.3s ease; /* Añadida transición para color */
+}
+
+.inat-prediction-probability {
+  flex-basis: auto; /* Se ajusta al contenido */
+  width: 55px; /* Ancho fijo para alinear porcentajes */
+  text-align: right;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-left: 0.5rem; /* Espacio después de la barra */
+}
+
+.inat-search-button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem; /* Espacio antes del botón */
+    border-radius: var(--border-radius-round);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.inat-search-button:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-hover-bg);
+}
+
+
+.inat-footer {
+  background-color: var(--footer-bg);
+  padding: 2rem 0;
+  border-top: 1px solid var(--card-border);
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer-content-inat p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inat-main {
+    padding: 1.5rem;
+    margin: 1rem auto;
+  }
+  .header-content-inat {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .main-nav-inat {
+    width: 100%;
+    justify-content: space-around;
+  }
+  .inat-hero-title {
+    font-size: 1.8rem;
+  }
+  .inat-classifier-section {
+    padding: 1.5rem;
+  }
+
+  /* Ajustes para layout de imagen y resultados en móvil */
+  .inat-content-with-results {
+    flex-direction: column; /* Apilar en móvil */
+    align-items: center; /* Centrar la imagen si es más pequeña */
+  }
+  .inat-image-display-area {
+    flex: 0 0 auto; /* Resetear flex para que tome su tamaño natural */
+    width: 100%; /* Ocupar todo el ancho disponible */
+    max-width: 300px; /* Limitar el ancho máximo de la imagen en móvil */
+    margin-bottom: 1.5rem; /* Espacio entre imagen y resultados */
+  }
+  .inat-results-section {
+    width: 100%; /* Resultados ocupan todo el ancho */
+  }
+}
+
+@media (max-width: 480px) {
+    .inat-prediction-item {
+        flex-wrap: wrap; /* Permitir que los elementos se envuelvan si no caben */
+    }
+    .inat-prediction-label {
+        flex-basis: 100%; /* El label ocupa toda la primera línea */
+        margin-bottom: 0.25rem;
+        margin-right: 0;
+    }
+    .inat-prediction-bar-container {
+        flex-basis: calc(100% - 60px - 1rem); /* Barra ocupa espacio menos prob y botón */
+    }
+    .inat-prediction-probability {
+        margin-left: 0;
+    }
+    .inat-search-button {
+        margin-left: auto; /* Empujar el botón a la derecha en la segunda línea */
+    }
+}
+
+/* frontend/src/styles/iNatPage.css */
+
+/* ... (todos tus estilos existentes de iNatPage.css van aquí arriba) ... */
+
+/* NUEVOS ESTILOS PARA LA DESCRIPCIÓN DE WIKIPEDIA */
+.inat-description-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.spinner-description { /* Spinner similar pero podría ser de otro color si quieres */
+  border: 3px solid var(--primary-hover-bg);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  width: 22px;
+  height: 22px;
+  animation: spin 1s ease-in-out infinite; /* Reutiliza la animación 'spin' */
+}
+
+.inat-species-description-section {
+    margin-top: 2.5rem; /* Espacio después de los resultados/imagen */
+    padding: 1.5rem;
+    background-color: var(--card-bg); /* O var(--background-color) si prefieres que no sea una "tarjeta" */
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.inat-species-description-section .description-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.inat-species-description-section .description-header h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.inat-species-description-section .description-header svg {
+    color: var(--primary-color);
+}
+
+.inat-species-description-section .description-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-light);
+    /* Para preservar saltos de línea si el texto de Wikipedia los tuviera (aunque explaintext los suele quitar) */
+    white-space: pre-wrap;
+}
+
+/* Ajustes responsivos para la descripción si es necesario */
+@media (max-width: 768px) {
+    .inat-species-description-section {
+        margin-top: 2rem;
+        padding: 1rem;
+    }
+}
