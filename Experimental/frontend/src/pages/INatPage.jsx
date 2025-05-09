@@ -230,7 +230,7 @@ const INatPage = () => {
               <input
                 type="file"
                 id="inat-file-input"
-                accept="image/png, image/jpeg, image/jpg"
+                accept="image/png, image/jpeg, image/jpg,image/webp"
                 onChange={handleFileChange}
                 disabled={isLoading}
               />
