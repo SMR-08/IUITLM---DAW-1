@@ -160,6 +160,8 @@
   text-align: center;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--card-border);
+  width: 100%;
+  margin-left: 1.5rem;
 }
 
 .inat-hero-title {
@@ -180,8 +182,8 @@
   background-color: var(--card-bg);
   padding: 2rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--card-border);
+  /* box-shadow: var(--shadow-md);
+  border: 1px solid var(--card-border); */
   width: 100%;
 }
 

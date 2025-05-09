@@ -336,7 +336,7 @@ const INatPage = () => {
       {/* ... Footer sin cambios ... */}
       <footer className="inat-footer">
         <div className="footer-content-inat">
-          <p>© {new Date().getFullYear()} Clasificador iNat - Desarrollado con IA</p>
+          <p>© {new Date().getFullYear()} Clasificador iNat</p>
         </div>
       </footer>
     </div>
