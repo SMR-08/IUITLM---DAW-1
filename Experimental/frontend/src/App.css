@@ -36,6 +36,20 @@
   --border-radius-large: 12px; /* For cards */
   --border-radius-round: 50%;
   --transition: all 0.3s ease;
+
+  /* NLP Page Specific Variables (consider moving to nltk-page.css if not shared) */
+  --primary-color: #6366f1; /* Indigo */
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --secondary-color: #10b981; /* Emerald */
+  --text-light: #6b7280; /* Medium Gray */
+  --background-color: #ffffff;
+  --card-border: #e5e7eb; /* Light Gray */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --primary-hover-bg: rgba(99, 102, 241, 0.1);
+  --color-on-primary: #ffffff; /* Text on primary color */
 }
 
 .dark-theme {
@@ -68,6 +82,20 @@
   /* --sun-color remains orange */
   /* --moon-base-color remains dark gray */
   /* --moon-crater-color remains light gray */
+
+  /* NLP Page Specific Variables (consider moving to nltk-page.css if not shared) */
+  --primary-color: #818cf8; /* Lighter Indigo */
+  --primary-light: #a5b4fc;
+  --primary-dark: #4f46e5; /* Keep darker variant for contrast */
+  --secondary-color: #34d399; /* Lighter Emerald */
+  --text-light: #9ca3af; /* Lighter Medium Gray */
+  --background-color: #111827; /* Dark blue/gray */
+  --card-border: #374151; /* Medium Dark Gray */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --primary-hover-bg: rgba(129, 140, 248, 0.2);
+  --color-on-primary: #ffffff; /* Text on primary color */
 }
 
 /* Removed redundant dark theme overrides here as variables handle it */
@@ -354,4 +382,4 @@ body {
   .apps-grid {
     grid-template-columns: 1fr;
   }
-} 
+}

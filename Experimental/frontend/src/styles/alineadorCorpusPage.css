@@ -1,0 +1,336 @@
+/* Basic styles for Alineador Corpus page */
+.alineador-corpus-container {
+    padding: 20px;
+}
+
+.alineador-corpus-container h1 {
+    color: #333;
+}
+/* Styles copied from iNatPage.css for the header */
+.alineador-corpus-header {
+  background-color: var(--header-bg);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.alineador-corpus-header .alineador-corpus-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.alineador-corpus-header .alineador-corpus-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.alineador-corpus-header .alineador-corpus-brain-icon {
+  color: #ffc107; /* Set color directly to yellow */
+}
+
+.alineador-corpus-header .alineador-corpus-logo-section h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.alineador-corpus-header .alineador-corpus-main-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.alineador-corpus-header .alineador-corpus-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.alineador-corpus-header .alineador-corpus-nav-link:hover {
+  color: var(--primary-color);
+  background-color: var(--primary-hover-bg);
+}
+
+.alineador-corpus-header .alineador-corpus-theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: var(--toggle-bg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  transition: var(--transition);
+}
+
+.alineador-corpus-header .alineador-corpus-toggle-ball {
+  position: absolute;
+  left: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--border-radius-round);
+  background-color: var(--toggle-ball-bg);
+  box-shadow: var(--toggle-ball-shadow);
+  transition: var(--transition);
+}
+
+.alineador-corpus-header.dark-theme .alineador-corpus-toggle-ball, .alineador-corpus-header.dark-theme-page-specific .alineador-corpus-toggle-ball {
+  left: 33px;
+}
+
+.alineador-corpus-header .alineador-corpus-sun-icon,
+.alineador-corpus-header .alineador-corpus-moon-icon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition: opacity var(--transition);
+  opacity: 1;
+}
+
+.alineador-corpus-header .alineador-corpus-sun-icon {
+  right: 8px;
+  background: radial-gradient(circle, var(--sun-color) 30%, transparent 30%);
+  box-shadow: 0 0 0 2px var(--sun-color);
+  border-radius: var(--border-radius-round);
+}
+
+.alineador-corpus-header .alineador-corpus-moon-icon {
+  left: 8px;
+  background: radial-gradient(circle at 70% 30%, var(--moon-crater-color) 30%, var(--moon-base-color) 30%);
+  border-radius: var(--border-radius-round);
+  opacity: 0.5;
+}
+
+.alineador-corpus-header.dark-theme .alineador-corpus-sun-icon, .alineador-corpus-header.dark-theme-page-specific .alineador-corpus-sun-icon {
+  opacity: 0.5;
+}
+
+.alineador-corpus-header.dark-theme .alineador-corpus-moon-icon, .alineador-corpus-header.dark-theme-page-specific .alineador-corpus-moon-icon {
+  opacity: 1;
+}
+
+/* Responsive styles for header */
+@media (max-width: 768px) {
+  .alineador-corpus-header .alineador-corpus-header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .alineador-corpus-header .alineador-corpus-main-nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+}
+
+/* Styles copied from iNatPage.css for main content, upload area, and button */
+.alineador-corpus-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1000px; /* Adjusted for layout */
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.alineador-corpus-main .alineador-corpus-classifier-section {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  width: 100%;
+}
+
+.alineador-corpus-main .alineador-corpus-hero-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  text-align: center; /* Center the title */
+}
+
+.alineador-corpus-main .alineador-corpus-hero-description {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto 1.5rem auto;
+  text-align: center; /* Center the description */
+}
+
+/* Flex container for upload areas */
+.alineador-corpus-upload-area {
+  display: flex;
+  /* Default to column, will be row on larger screens (handled by media query) */
+  flex-direction: column; 
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 70%; 
+  margin-left: 15%;
+}
+
+/* Container for each file upload (Spanish/English) */
+.alineador-corpus-upload-column {
+    flex: 1; /* Allow columns to take equal space in a row layout */
+    width: 100%; /* Ensure it takes full width in a column layout */
+}
+
+
+.alineador-corpus-main .alineador-corpus-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Make label take full width of its column/container */
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed var(--primary-light);
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  text-align: center;
+}
+
+.alineador-corpus-main .alineador-corpus-file-label:hover {
+  border-color: var(--primary-color);
+  background-color: var(--primary-hover-bg);
+}
+
+.alineador-corpus-main .alineador-corpus-file-label input[type="file"] {
+  display: none;
+}
+
+.alineador-corpus-main .alineador-corpus-file-label span {
+  margin-top: 0.75rem;
+  font-weight: 500;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alineador-corpus-main .alineador-corpus-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center; /* Center the button */
+    margin-top: 1rem;
+}
+
+.alineador-corpus-main .alineador-corpus-submit-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color); /* Use primary color for button */
+  color: var(--color-on-primary);
+}
+
+.alineador-corpus-main .alineador-corpus-submit-button:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.alineador-corpus-main .alineador-corpus-submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Message area styles */
+.alineador-corpus-message {
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.alineador-corpus-message.success {
+    background-color: rgba(16, 185, 129, 0.1); /* Light green with alpha */
+    color: #10b981; /* Emerald green */
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.alineador-corpus-message.error {
+    background-color: rgba(239, 68, 68, 0.1); /* Light red with alpha */
+    color: #ef4444; /* Red */
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dark-theme .alineador-corpus-message.success {
+    background-color: rgba(52, 211, 153, 0.2); /* Darker green with alpha */
+    color: #a7f3d0; /* Lighter green */
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.dark-theme .alineador-corpus-message.error {
+    background-color: rgba(239, 68, 68, 0.2); /* Darker red with alpha */
+    color: #f87171; /* Lighter red */
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+
+/* Responsive adjustments for upload area */
+@media (min-width: 768px) {
+  .alineador-corpus-main .alineador-corpus-upload-area {
+    flex-direction: row; /* Side-by-side on larger screens */
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .alineador-corpus-main .alineador-corpus-upload-area {
+    width: 90%; /* Adjust width for small screens */
+    margin-left: 5%; /* Center the narrower block */
+    flex-direction: column; /* Stack items */
+    gap: 1.5rem; /* Maintain gap between stacked items */
+  }
+
+  .alineador-corpus-upload-column {
+    width: 100%; /* Make upload columns take full width */
+  }
+  
+  .alineador-corpus-main .alineador-corpus-file-label {
+    width: 100%; /* Make file labels take full width */
+  }
+}
+
+/* Add a specific footer style if needed */
+/*
+.alineador-corpus-footer {
+    background-color: var(--footer-bg);
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--card-border);
+    text-align: center;
+    margin-top: auto; // Ensure footer is at the bottom if content is short
+}
+
+.alineador-corpus-footer .footer-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+*/

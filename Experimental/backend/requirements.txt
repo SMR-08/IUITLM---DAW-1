@@ -1,3 +1,10 @@
 fastapi
 uvicorn[standard]
 google-generativeai
+python-multipart
+nltk>=3.6
+spacy>=3.0
+werkzeug
+sentence-transformers
+scikit-learn
+hf_xet
